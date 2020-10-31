@@ -26,8 +26,8 @@ public class shoulder extends Part {
 	Handler handler;
 
 	
-	public shoulder(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
-		super(x, y, SW, SH, SD, id,px,py,pz, owner);
+	public shoulder(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id,px,py,pz, owner);
 		this.handler = handler;
 		weight = 10;
 		direction=45*Game.sign(-px);
@@ -42,7 +42,7 @@ public class shoulder extends Part {
 		int[] Y=  {-4,-4,4,4};
 		
 		int PX=7*Game.sign(px);
-		addPart(new upper_arm(x,y-16,X,Y,null,ID.upper_arm, PX,3,0,this,handler));
+		addPart(new upper_arm(x,y-16,X,Y,null,null, ID.upper_arm, PX,3,0,this,handler));
 		//addPart(new tibia(x,y-16,X,Y,ID.tibia, 0,15,this,handler));
 	}
 

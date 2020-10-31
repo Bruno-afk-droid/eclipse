@@ -26,8 +26,8 @@ public class upper_arm extends Part {
 	Handler handler;
 
 	
-	public upper_arm(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
-		super(x, y, SW, SH, SD, id,px,py,pz, owner);
+	public upper_arm(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id,px,py,pz, owner);
 		this.handler = handler;
 		weight = 10;
 		direction = 0;
@@ -47,7 +47,7 @@ public class upper_arm extends Part {
 		int[] Y=  {-4,-4,4,4};
 		
 		int PX=14*Game.sign(px);
-		addPart(new fore_arm(x,y-16,X,Y,null, ID.fore_arm, PX,0,0,this,handler));
+		addPart(new fore_arm(x,y-16,X,Y,null, null, ID.fore_arm, PX,0,0,this,handler));
 		
 		//addPart(new tibia(x,y-16,X,Y,ID.tibia, 0,15,this,handler));
 		//addPart(new tibia(x,y-16,X,Y,ID.tibia, 0,15,this,handler));

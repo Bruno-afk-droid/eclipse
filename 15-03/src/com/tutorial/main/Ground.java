@@ -25,8 +25,8 @@ public class Ground extends GameObject {
 	Handler handler;
 	
 	
-	public Ground(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py, int pz,Handler handler) {
-		super(x, y, SW, SH, SD, id, py, py, pz);
+	public Ground(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py, int pz,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id, py, py, pz);
 		this.handler = handler;
 		weight = 100;
 	}

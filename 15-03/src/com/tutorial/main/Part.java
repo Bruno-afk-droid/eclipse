@@ -13,8 +13,8 @@ public abstract class Part extends GameObject{
 	protected LinkedList<Part> LimpParts = new LinkedList<Part>();
 	protected GameObject H_owner;
 	
-	public Part(int x,int y,int[] SW, int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner) {
-		super(x,y,SW,SH,SD,id, py, py, pz);
+	public Part(int x,int y,int[] SW, int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner) {
+		super(x,y,SW,SH,SD,layers,id, py, py, pz);
 		this.px = px;
 		this.py = py;
 		this.pz = pz;

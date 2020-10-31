@@ -26,8 +26,8 @@ public class Player extends GameObject {
 	Random r = new Random();
 	Handler handler;
 	//int x,int y,int[] SW, int[] SH, ID id,int px,int py
-	public Player(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,Handler handler) {
-		super(x, y, SW, SH, SD, id, px, py, pz);
+	public Player(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id, px, py, pz);
 		this.handler = handler;
 		weight = 100;
 
@@ -57,7 +57,7 @@ public class Player extends GameObject {
 		int[] YN=  {0,0,-2,-7,-7,-2};
 		 */
 		
-		addPart(new Hip(x,y-8,X,Y,null,ID.Hip, 0,11,0,this,handler));
+		//addPart(new Hip(x,y-8,X,Y,null,null, ID.Hip, 0,11,0,this,handler));
 		//addPart(new shoulder(x,y-8,XR,YR,null,ID.shoulder, -16,-10,0,this,handler));
 		//addPart(new shoulder(x,y-8,XL,YL,null,ID.shoulder,  16,-10,0,this,handler));
 		//addPart(new neck(x,y-8,XN,YN,null,ID.neck, 0,-20,0,this,handler));
@@ -346,7 +346,7 @@ public class Player extends GameObject {
 		//g2d.drawImage(Skin, at, null);
 		
 		g.setColor(Color.red);
-		g2d.draw(new Area(getBounds()));
+		g2d.fillPolygon(getBounds());
 		
 		//renderPart(g);
 		}

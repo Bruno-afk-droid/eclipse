@@ -13,6 +13,7 @@ public abstract class GameObject {
 
 	protected int x, y, z=0;
 	protected int[] SW,SH,SD;
+	protected int[] layers;
 	protected ID id;
 	protected int hsp, vsp;
 	protected double dsp;
@@ -30,7 +31,7 @@ public abstract class GameObject {
 	public int pz;
 	
 	
-	public GameObject(int x,int y,int[] SW, int[] SH,int[] SD, ID id,int px,int py,int pz) {
+	public GameObject(int x,int y,int[] SW, int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz) {
 		this.x = x;
 		this.y = y;
 		this.SW = SW;
@@ -41,6 +42,10 @@ public abstract class GameObject {
 			this.SD[i]=0;
 			}else
 		this.SD=SD;
+		if(layers==null) {
+		this.layers = new int[1];
+		this.layers[0]=SW.length;
+		}
 		this.id = id;
 		this.px=px;
 		this.py=py;
@@ -65,8 +70,19 @@ public abstract class GameObject {
 		
 		Point Dpt[] = new Point[polX.length];
 		
-
+		Polygon result = new Polygon();
+		Polygon[] Lay = new Polygon[layers.length];
+		for(int i=0;i<layers.length;i++)
+		Lay[i] = new Polygon();
+				
 		for(int i=0;i<polX.length;i++) {	
+			
+			int L=layers[0];
+			int j;
+			for(j=0;L<i;j++) 
+			L+=layers[j];
+			
+		
 			
 		polX[i] = SW[i]+x;
 		polY[i] = SH[i]+y;		
@@ -81,7 +97,12 @@ public abstract class GameObject {
 		Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
 		polX[i] = Dpt[i].x;
 		polY[i] = Dpt[i].y;
+		
+		Lay[j].addPoint(polX[i], polY[i]);
+		
 		}
+		
+				
 		return new Polygon(polX,polY,polX.length);
 
 	}

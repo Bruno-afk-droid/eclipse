@@ -26,8 +26,8 @@ public class fore_arm extends Part {
 	Handler handler;
 
 	
-	public fore_arm(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
-		super(x, y, SW, SH, SD, id,px,py,pz, owner);
+	public fore_arm(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id,px,py,pz, owner);
 		this.handler = handler;
 		weight = 10;
 		direction = 0;

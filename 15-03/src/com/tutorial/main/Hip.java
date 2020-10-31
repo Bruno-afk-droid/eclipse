@@ -26,8 +26,8 @@ public class Hip extends Part {
 	Handler handler;
 
 	
-	public Hip(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
-		super(x, y, SW, SH, SD, id,px,py,pz,owner);
+	public Hip(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
+		super(x, y, SW, SH, SD,layers, id,px,py,pz,owner);
 		this.handler = handler;
 		weight = 10;
 		direction = 0;
@@ -40,8 +40,8 @@ public class Hip extends Part {
 		int[] X = {-4,-4,4,4};
 		int[] Y=  {0,18,18,0};
 		
-		addPart(new Limb(x,y-8,X,Y,null, ID.Limb, -8,12,0,this,handler));
-		addPart(new Limb(x,y-8,X,Y,null, ID.Limb,  8,12,0,this,handler));	
+		addPart(new Limb(x,y-8,X,Y,null, null, ID.Limb, -8,12,0,this,handler));
+		addPart(new Limb(x,y-8,X,Y,null, null, ID.Limb,  8,12,0,this,handler));	
 	}
 
 	

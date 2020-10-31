@@ -26,8 +26,8 @@ public class neck extends Part {
 	Handler handler;
 
 	
-	public neck(int x, int y,int[] SW,int[] SH,int[] SD, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
-		super(x, y, SW, SH, SD, id,px,py,pz, owner);
+	public neck(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,GameObject owner,Handler handler) {
+		super(x, y, SW, SH, SD, layers, id,px,py,pz, owner);
 		this.handler = handler;
 		weight = 10;
 		direction = 0;
@@ -46,7 +46,7 @@ public class neck extends Part {
 		//		int[] X = {-6,-8,-8 ,-6 ,-3 ,0  ,3  ,6  ,8  ,8 ,6,0};
 		//		int[] Y=  {0,-6 ,-10,-14,-16,-17,-16,-14,-10,-6,0,3};
 		
-		addPart(new head(x,y-8,X,Y,null, ID.head, 0,-6,0,this,handler));
+		addPart(new head(x,y-8,X,Y,null, layers, ID.head, 0,-6,0,this,handler));
 		//addPart(new Limb(x,y-8,X,Y,ID.Limb, -8,8,this,handler));
 		//addPart(new Limb(x,y-8,X,Y,ID.Limb,  8,8,this,handler));	
 	}
