@@ -3,10 +3,14 @@ package com.tutorial.main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class Game extends Canvas implements Runnable{
@@ -44,15 +48,29 @@ public class Game extends Canvas implements Runnable{
 			
 			
 
- 			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
-			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7,7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
-			int[] Z=  {0,0,0,0,0,0,0,0,0,0,0,0, 10,10,10,10,10,10,10,10,10,10,10,10};
-			int[] L=  {X.length,X.length};
- 
+			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10
+					  ,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
 			
+			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7
+					  ,7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
+			
+			int[] Z=  {-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5
+				       ,5,5,5,5,5,5,5,5,5,5,5,5};
+			
+			int[] L=  {12,X.length/2};
+ 
+			/*
+			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10
+ 						,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
+			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7,
+						7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
+			int[] Z=  {-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,
+					   5,5,5,5,5,5,5,5,5,5,5,5};
+			int[] L=  {X.length/2,X.length/2};
+			 */
 
-		
 		handler.addObject(new Player(WIDTH/2-64-1, HEIGHT/2-64,X,Y, Z, L, ID.Player, 0, 0, 0, handler));
+
 		 
 		
 		
@@ -327,7 +345,73 @@ public class Game extends Canvas implements Runnable{
 				}
 			return false;
 		}
+			/*
+    Area a = new Area(new Rectangle(1, 1, 5, 5));
+    PathIterator iterator = a.getPathIterator(null);
+    float[] floats = new float[6];
+    Polygon polygon = new Polygon();
+    while (!iterator.isDone()) {
+        int type = iterator.currentSegment(floats);
+        int X = (int) floats[0];
+        int X = (int) floats[1];
+        if(type != PathIterator.SEG_CLOSE) {
+            polygon.addPoint(X, X);
+            System.out.println("adding x = " + X + ", y = " + Y);
+        }
+        iterator.next();
+    }
+    }
+			 */
+			/*
+			Area AR = new Area();
+			
+			for(int i=0;i<A.size();i++) {
+			AR.add(new Area(A.get(i)));
+			}
+			
+			Polygon result = new Polygon();
+			for(int i=0;i<A.size();i++) {
+				Polygon Pol=A.get(i);
+				
+				
+				for(int j=0;j<Pol.npoints;j++) {
 
+						result.addPoint(Pol.xpoints[j], Pol.ypoints[j]);
+				}
+				
+			}
+			
+			return result;
+			 */
+		public static Polygon outlineTetrahedron(LinkedList<Polygon> A) {
+			Area AR = new Area();
+			
+			for(int i=0;i<A.size();i++) {
+			AR.add(new Area(A.get(i)));
+			}
+			
+		
+		    PathIterator iterator = AR.getPathIterator(null);
+		    float[] floats = new float[6];
+		    Polygon result = new Polygon();
+		    while (!iterator.isDone()) {
+		        int type = iterator.currentSegment(floats);
+		        int X = (int) floats[0];
+		        int Y = (int) floats[1];
+		        if(type != PathIterator.SEG_CLOSE) {
+		            result.addPoint(X, Y);
+		            //System.out.println("adding x = " + X + ", y = " + Y);
+		        }
+		        iterator.next();
+		    }
+			return result;
+		}
+		public void renderTetrahedron(LinkedList<Polygon> A,Graphics g) {
+			Graphics2D g2d = (Graphics2D) g;
+			for(int i=0;i<A.size();i++) {
+			g2d.draw(A.get(i));
+			}
+		}
 
 
 }

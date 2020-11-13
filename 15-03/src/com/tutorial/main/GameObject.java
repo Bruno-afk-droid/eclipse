@@ -45,7 +45,7 @@ public abstract class GameObject {
 		if(layers==null) {
 		this.layers = new int[1];
 		this.layers[0]=SW.length;
-		}
+		}else this.layers = layers;
 		this.id = id;
 		this.px=px;
 		this.py=py;
@@ -63,49 +63,64 @@ public abstract class GameObject {
 		//SD[i] = Math.sqrt(x^2)
 		
 
-		int[] polX = new int[SW.length];
-		int[] polY = new int[SH.length];
-		int[] polZ = new int[SD.length];
-			
-		
-		Point Dpt[] = new Point[polX.length];
-		
-		Polygon result = new Polygon();
-		Polygon[] Lay = new Polygon[layers.length];
-		for(int i=0;i<layers.length;i++)
-		Lay[i] = new Polygon();
-				
-		for(int i=0;i<polX.length;i++) {	
-			
-			int L=layers[0];
-			int j;
-			for(j=0;L<i;j++) 
-			L+=layers[j];
-			
-		
-			
-		polX[i] = SW[i]+x;
-		polY[i] = SH[i]+y;		
-		
-		polZ[i]= (Game.rotatePoint(new Point(polX[i], SD[i]+z),new Point(x,z),Z_direction)).y;
-		polX[i]= (Game.rotatePoint(new Point(polX[i], SD[i]+z),new Point(x,z),Z_direction)).x;	
-		
-		int SDZ=polZ[i];		
-	    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).y;
-		polY[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).x;				
-			
-		Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
-		polX[i] = Dpt[i].x;
-		polY[i] = Dpt[i].y;
-		
-		Lay[j].addPoint(polX[i], polY[i]);
-		
-		}
-		
-				
-		return new Polygon(polX,polY,polX.length);
 
+		
+		LinkedList<Polygon> Polys = new LinkedList<Polygon>();
+		
+		
+		int o=0;
+		
+		int[] pX = new int[SW.length];
+		int[] pY = new int[SW.length];
+        for(int L=0;L<layers.length;L++) {
+        	
+    		int[] polX = new int[layers[L]];
+    		int[] polY = new int[layers[L]];
+    		int[] polZ = new int[layers[L]];
+    		
+
+    		
+    		
+    		Point Dpt[] = new Point[polX.length];
+    		
+    		LinkedList<Polygon> SP = new LinkedList<Polygon>();
+	        	for(int i=0;i<layers[L];i++) {	
+					
+				
+				polX[i] = SW[i+o]+x;
+				polY[i] = SH[i+o]+y;					
+				
+				polZ[i]= (Game.rotatePoint(new Point(polX[i], SD[i+o]+z),new Point(x,z),Z_direction)).y;
+				polX[i]= (Game.rotatePoint(new Point(polX[i], SD[i+o]+z),new Point(x,z),Z_direction)).x;	
+				
+				int SDZ=polZ[i];		
+			    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).y;
+				polY[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).x;				
+					
+				Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
+				polX[i] = Dpt[i].x;
+				polY[i] = Dpt[i].y;		
+				
+				if(i!=0)
+				if(L!=0) {
+				int[] X={pX[i],pX[i-1],polX[i-1],polX[i],pX[i]};	
+				int[] Y={pY[i],pY[i-1],polY[i-1],polY[i],pY[i]};	
+				SP.add(new Polygon(X,Y,X.length));
+				}
+				
+		        	}
+	    Polys.add(Game.outlineTetrahedron(SP));   	
+	        	
+		Polys.add(new Polygon(polX,polY,polX.length));
+		pX=polX;
+		pY=polY;
+		
+			o+=layers[L];
+        }
+        return  Game.outlineTetrahedron(Polys);
 	}
+	
+
 	
 	public Area getAllBounds(){
 		

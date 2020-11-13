@@ -23,6 +23,8 @@ public class Handler {
 		}
 	}
 	
+	
+	
 	public void addObject(GameObject object) {
 		this.object.add(object);
 	}
