@@ -83,7 +83,7 @@ public abstract class GameObject {
     		
     		Point Dpt[] = new Point[polX.length];
     		
-    		LinkedList<Polygon> SP = new LinkedList<Polygon>();
+    		Polygon SP = new Polygon();
 	        	for(int i=0;i<layers[L];i++) {	
 					
 				
@@ -103,21 +103,26 @@ public abstract class GameObject {
 				
 				if(i!=0)
 				if(L!=0) {
-				int[] X={pX[i],pX[i-1],polX[i-1],polX[i],pX[i]};	
-				int[] Y={pY[i],pY[i-1],polY[i-1],polY[i],pY[i]};	
-				SP.add(new Polygon(X,Y,X.length));
+				Polys.add(new Polygon(new int[] {polX[i],pX[i],pX[i-1],polX[i-1]},new int[] {polY[i],pY[i],pY[i-1],polY[i-1]},4));
+					
 				}
 				
 		        	}
-	    Polys.add(Game.outlineTetrahedron(SP));   	
+	    //Polys.add(Game.outlineTetrahedron(SP));   	
 	        	
 		Polys.add(new Polygon(polX,polY,polX.length));
+	        	
+		Polys.add(SP);
+
 		pX=polX;
 		pY=polY;
 		
 			o+=layers[L];
         }
-        return  Game.outlineTetrahedron(Polys);
+        Polygon result = Game.outlineTetrahedron(Polys);
+        	
+        
+        return  result;
 	}
 	
 
@@ -125,7 +130,7 @@ public abstract class GameObject {
 	public Area getAllBounds(){
 		
 		Area A = new Area(getBounds());
-
+			
 			for(int i=0;i<LimpParts.size();i++) { 
 				GameObject b=LimpParts.get(i);
 				A.add(b.getAllBounds());

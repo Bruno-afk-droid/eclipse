@@ -25,6 +25,8 @@ public class Game extends Canvas implements Runnable{
 	public static boolean BDown = false;
 	public static boolean BSpace = false;
 	
+	//test
+	
 	private Thread thread;
 	private boolean running = false;
 

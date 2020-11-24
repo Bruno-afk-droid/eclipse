@@ -75,7 +75,7 @@ public class Player extends GameObject {
 		grv +=HUD.GRAVITY*(weight/50);
 		if(vsp > 10)
 		grv = 0;
-		///vsp += grv;
+		//vsp += grv;
 					
 		direction=Game.Deg(direction+dsp);
 		Z_direction=Game.Deg(Z_direction);
@@ -90,7 +90,6 @@ public class Player extends GameObject {
 		Z_direction++;
 		if(Game.BRight == true)
 		Z_direction--;
-		
 		
 		dsp=0;
 
@@ -348,7 +347,7 @@ public class Player extends GameObject {
 		g.setColor(Color.red);
 		g2d.draw(getBounds());
 		
-		//renderPart(g);
+		renderPart(g);
 		}
 	
 	BufferedImage LoadImage(String FileName) 
