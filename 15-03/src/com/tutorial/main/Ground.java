@@ -53,8 +53,8 @@ public class Ground extends GameObject {
 	}
 	
 	public void tick() {
-			//if(Game.BUp)direction++;
-			//if(Game.BDown)direction--;
+			if(Game.BUp)direction++;
+			if(Game.BDown)direction--;
 
 	}
 	

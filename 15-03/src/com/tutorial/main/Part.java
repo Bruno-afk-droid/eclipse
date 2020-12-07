@@ -55,6 +55,19 @@ public abstract class Part extends GameObject{
 
 	}
 	
+	public Area getAllArea(){
+		
+		Area A = getArea();
+			
+			for(int i=0;i<LimpParts.size();i++) { 
+				GameObject b=LimpParts.get(i);
+				A.add(b.getAllArea());
+			}
+		
+		return new Area(A);
+
+	}
+	
 	public void renderPart(Graphics g) {
 		for(int i = 0;i < LimpParts.size(); i++) {
 		Part tempObject = LimpParts.get(i);

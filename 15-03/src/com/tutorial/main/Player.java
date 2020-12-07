@@ -1,15 +1,19 @@
 package com.tutorial.main;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +33,10 @@ public class Player extends GameObject {
 	public Player(int x, int y,int[] SW,int[] SH,int[] SD,int[] layers, ID id,int px,int py,int pz,Handler handler) {
 		super(x, y, SW, SH, SD, layers, id, px, py, pz);
 		this.handler = handler;
+		this.ObjectType="MOB";
+		this.texture = LoadImage("GameDebugImage.png");
+
+
 		weight = 100;
 
 		int[] X = {-8,-12,-10  ,0   ,10   ,12  ,8 ,0};
@@ -57,7 +65,7 @@ public class Player extends GameObject {
 		int[] YN=  {0,0,-2,-7,-7,-2};
 		 */
 		
-		//addPart(new Hip(x,y-8,X,Y,null,null, ID.Hip, 0,11,0,this,handler));
+		addPart(new Hip(x,y-8,X,Y,null,null, ID.Hip, 0,11,0,this,handler));
 		//addPart(new shoulder(x,y-8,XR,YR,null,ID.shoulder, -16,-10,0,this,handler));
 		//addPart(new shoulder(x,y-8,XL,YL,null,ID.shoulder,  16,-10,0,this,handler));
 		//addPart(new neck(x,y-8,XN,YN,null,ID.neck, 0,-20,0,this,handler));
@@ -75,12 +83,17 @@ public class Player extends GameObject {
 		grv +=HUD.GRAVITY*(weight/50);
 		if(vsp > 10)
 		grv = 0;
-		//vsp += grv;
+		vsp += grv;
 					
 		direction=Game.Deg(direction+dsp);
 		Z_direction=Game.Deg(Z_direction);
 		
-		//direction++;
+		
+		direction=0;
+		if(Game.BLeft == true)
+		S_direction++; else S_direction = 0;
+		Z_direction=45;
+		/*
 		if(Game.BDown == true)
 		S_direction--;
 		if(Game.BUp == true)
@@ -90,6 +103,7 @@ public class Player extends GameObject {
 		Z_direction++;
 		if(Game.BRight == true)
 		Z_direction--;
+		*/
 		
 		dsp=0;
 
@@ -338,17 +352,29 @@ public class Player extends GameObject {
 		
 		//BufferedImage Skin = LoadImage("blok.png");
 		
-		//AffineTransform at = AffineTransform.getTranslateInstance(x-16,y-16);
-		//at.rotate(Math.toRadians(direction+=hsp), Skin.getWidth()/2, Skin.getHeight()/2); 
+		AffineTransform at = AffineTransform.getTranslateInstance(x,y);
+		at.rotate(Math.toRadians(direction), texture.getWidth()/2, texture.getHeight()/2); 
 		Graphics2D g2d = (Graphics2D) g;
 		
-		//g2d.drawImage(Skin, at, null);
 		
+		//g2d.drawImage(texture, at, null);
+		LinkedList<Polygon> T = getTertradon(0,0,0);
+		LinkedList<int[]> TD = getTertradonDepth(Z_direction,S_direction);
+		//for(int i=0;i<T.size();i++) {
+		Polygon P = T.get(0);
+		//render3DImage(texture,P,TD.get(0),g2d);
+		//g2d.draw(T.get(0));
+		//}
+		//g.setColor(Color.blue);
+		//g2d.fill(getBounds());
 		g.setColor(Color.red);
-		g2d.draw(getBounds());
-		
-		renderPart(g);
+		g2d.draw(getArea());
+		//g2d.drawImage(texture,0,0,10+x,10+y,null);
+		g2d.drawImage(Pseudo3D.computeImage(texture, new Point(50,0), new Point(0,0), new Point(0,50), new Point(50,50)), null, null);
+		//renderPart(g);
 		}
+	
+	
 	
 	BufferedImage LoadImage(String FileName) 
 	{
@@ -362,6 +388,8 @@ public class Player extends GameObject {
 		
 		return img;
 	}
+	
+
 
 
 	
