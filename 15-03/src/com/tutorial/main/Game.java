@@ -4,6 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -11,10 +12,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -59,28 +66,28 @@ public class Game extends Canvas implements Runnable{
 			handler.addObject(new Ground(WIDTH/2, HEIGHT/3*2,pX, pY, null, null, ID.Ground, 0, 0, 0, handler));
 			
 			
-
+			/*
+			int[] X = {16,-16,-16,16,16,-16,-16,16};
+			
+			int[] Y=  {-16,-16,16,16,-16,-16,16,16};
+			
+			int[] Z=  {-8,-8,-8,-8,8,8,8,8};
+			
+			int[] L=  {4,4};
+			*/
+			
 			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10
 					  ,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
 			
 			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7
 					  ,7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
 			
-			int[] Z=  {-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5
-				       ,5,5,5,5,5,5,5,5,5,5,5,5};
+			int[] Z=  {-20,-20,-20,-20,-20,-20,-20,-20,-20,-20,-20,-20
+				       ,20,20,20,20,20,20,20,20,20,20,20,20};
 			
 			int[] L=  {12,X.length/2};
- 
-			/*
-			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10
- 						,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
-			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7,
-						7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
-			int[] Z=  {-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,
-					   5,5,5,5,5,5,5,5,5,5,5,5};
-			int[] L=  {X.length/2,X.length/2};
-			 */
-
+			 
+		for(int i=0;i<1;i++)
 		handler.addObject(new Player(WIDTH/2-64-1, HEIGHT/2-64,X,Y, Z, L, ID.Player, 0, 0, 0, handler));
 
 		 
@@ -152,7 +159,7 @@ public class Game extends Canvas implements Runnable{
 		
 		Graphics g = bs.getDrawGraphics();
 		
-		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		handler.render(g);
@@ -235,8 +242,34 @@ public class Game extends Canvas implements Runnable{
 			return M;
 		}
 		
+		public static int MinIndex(int[] A) {
+			int I=0;
+			if(A.length==1)return 0;
+			int M=A[1];
+			for(int i=0;i<A.length;i++) {
+				if(A[i]>M) {M=A[i];
+				I=i;}
+			}
+			
+			return I;
+		}
+		
+		
+		
+		public static int MaxIndex(int[] A) {
+			int I=0;
+			if(A.length==1)return 0;
+			int M=A[1];
+			for(int i=0;i<A.length;i++) {
+				if(A[i]>M) {M=A[i];
+				I=i;}
+			}
+			
+			return I;
+		}
+		
 		public static int Max(int[] A) {
-			if(A.length==0)return 0;
+			if(A==null)return 0;
 			int M=A[1];
 			for(int i=0;i<A.length;i++) {
 				if(A[i]>M)M=A[i];
@@ -255,6 +288,17 @@ public class Game extends Canvas implements Runnable{
 			return M;
 		}
 		
+		public static int MinLIndex(LinkedList<Integer> tDnow) {
+			int I=0;
+			if(tDnow.size()==0)return 0;
+			int M=tDnow.get(0);
+			for(int i=0;i>tDnow.size();i++) {
+				if(tDnow.get(i)>M) {M=tDnow.get(i); I=i;}
+			}
+			
+			return I;
+		}		
+		
 		public static int Max(ArrayList<Integer> A) {
 			if(A.size()==0)return 0;
 			int M=A.get(0);
@@ -265,9 +309,25 @@ public class Game extends Canvas implements Runnable{
 			return M;
 		}
 		
+		public static int MaxLIndex(LinkedList<Integer> tDnow) {
+			int I=0;
+			if(tDnow.size()==0)return 0;
+			int M=tDnow.get(0);
+			for(int i=0;i<tDnow.size();i++) {
+				if(tDnow.get(i)>M) {M=tDnow.get(i); I=i;}
+			}
+			
+			return I;
+		}		
 		
-		public static float getAngle(Point cor,Point target) {
-		    return (float) Math.toDegrees(Math.atan2(target.x - cor.x, target.y - cor.y));
+		public static float getAngle(Point center,Point target) {
+		    float angle = (float) (Math.atan2(target.y - center.y, target.x - center.x)* 180 / Math.PI);
+
+		    if(angle < 0){
+		        angle += 360;
+		    }
+
+		    return angle;
 		}
 		
 		
@@ -284,6 +344,7 @@ public class Game extends Canvas implements Runnable{
 			return D;
 		}
 		
+		
 		public static int Avarage_Array(int[] j,int L) {
 			int AV=0;
 			for(int i=0;i<L;i++) {
@@ -293,18 +354,27 @@ public class Game extends Canvas implements Runnable{
 			return AV/j.length;
 		}
 		
-		public static int Avarage_ArrayList(ArrayList<Integer> A) {
+		public static double Avarage_Array(double[] j,int L) {
 			int AV=0;
-			for(int i=0;i<A.size();i++) {
-			AV+=A.get(i);	
+			for(int i=0;i<L;i++) {
+			AV+=j[i];	
+			}
+			
+			return AV/j.length;
+		}
+		
+		public static int Avarage_ArrayList(LinkedList<Integer> tDnow) {
+			int AV=0;
+			for(int i=0;i<tDnow.size();i++) {
+			AV+=tDnow.get(i);	
 			}
 			
 			if(AV!=0)
-			return AV/A.size();
-			else return 0;
+			return AV/tDnow.size();
+			else return 1;
 		}
 		
-		public static int[] Array_to_ArrayList(ArrayList<Integer> A) {
+		public static int[] Array_to_ArrayList(LinkedList<Integer> A) {
 			int[] R = new int[A.size()];
 			for(int i=0;i<A.size();i++) {
 				R[i]=A.get(i);
@@ -360,15 +430,36 @@ public class Game extends Canvas implements Runnable{
 			return false;
 		}
 			
-			public LinkedList<Polygon> sortOnDepth(LinkedList<Polygon> p,int[] a){
+			public static LinkedList<Polygon> sortOnDepth(LinkedList<Polygon> p,LinkedList<Integer> a){
 				LinkedList<Polygon> Poly = new LinkedList<Polygon>();
 				
+				while(p.size()!=0) {
+				int I = Game.MaxLIndex(a);
+				Poly.add(p.get(I));
+				a.remove(I);
+				p.remove(I);
+				}
 				
-				return p;		
+				return Poly;		
 			}
 			
+			public static LinkedList<int[]> sortOnDepthArray(LinkedList<int[]> p,LinkedList<Integer> b){
+				LinkedList<int[]> Poly = new LinkedList<int[]>();
+				
+				while(p.size()!=0) {
+				int I = Game.MaxLIndex(b);
+				Poly.add(p.get(I));
+				b.remove(I);
+				p.remove(I);
+				}
+				
+				return Poly;		
+			}
 			
-			
+			public static BufferedImage getBlankImage(int width, int height) {
+			    return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			}
+
 			/*
     Area a = new Area(new Rectangle(1, 1, 5, 5));
     PathIterator iterator = a.getPathIterator(null);
@@ -407,6 +498,11 @@ public class Game extends Canvas implements Runnable{
 			
 			return result;
 			 */
+			  private BufferedImage cropImage(BufferedImage src, Rectangle rect) {
+			      BufferedImage dest = src.getSubimage(0, 0, rect.width, rect.height);
+			      return dest; 
+			   }
+			
 		public static Polygon outlineTetrahedron(LinkedList<Polygon> A) {
 			Area AR = new Area();
 			for(int i=0;i<A.size();i++) {
@@ -447,8 +543,79 @@ public class Game extends Canvas implements Runnable{
 			}
 		}
 
+		public static Polygon RectangleToPolygon(Rectangle rect) {
+			   Polygon result = new Polygon(); 
+			   result.addPoint(rect.x, rect.y); 
+			   result.addPoint(rect.x + rect.width, rect.y); 
+			   result.addPoint(rect.x + rect.width, rect.y + rect.height); 
+			   result.addPoint(rect.x, rect.y + rect.height);
+			   return result; 
+			} 
+		public static BufferedImage ScaleBufferedimage(BufferedImage B,double W,double H) {
+		BufferedImage before = B;
+		int w = before.getWidth();
+		int h = before.getHeight();
+		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		AffineTransform at = new AffineTransform();
+		at.scale(W, H);
+		AffineTransformOp scaleOp = 
+		   new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		after = scaleOp.filter(before, after);
+		return after;
+		}
+		
+		public static BufferedImage resize(BufferedImage img, int newW, int newH) { 
+		    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+		    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
 
+		    Graphics2D g2d = dimg.createGraphics();
+		    g2d.drawImage(tmp, 0, 0, null);
+		    g2d.dispose();
+
+		    return dimg;
+		}  
+		
+		public static LinkedList<Polygon> shortOnDepth(LinkedList<int[]> Depth,LinkedList<Polygon> P){
+			int[] D = new int[Depth.size()];
+			for(int i=0;i<Depth.size();i++) {
+				D[i]=Avarage_Array(Depth.get(i),Depth.get(i).length);
+			}
+			
+			
+			LinkedList<Polygon> result= new LinkedList<Polygon>();
+			Area A = new Area();
+			
+			while(D[MinIndex(D)]!=D[MaxIndex(D)]) {
+			D[MinIndex(D)]=D[MaxIndex(D)];
+			Area B = new Area(P.get(MinIndex(D)));
+			B.subtract(A);
+			
+			if(!B.isEmpty())
+			result.add(P.get(MinIndex(D)));
+			}
+			
+
+			return result;	
+		}
+		public static double CheckAreaSize(Area A) {
+			Rectangle B = A.getBounds();
+			
+			return B.getWidth()*B.getHeight();		
+		}
+		
+		public static Polygon MovePolygon(Polygon P,int x,int y) {
+			
+			for(int i=0;i<P.npoints;i++) {
+				P.xpoints[i]+=x;
+				P.ypoints[i]+=y;
+			}
+			
+			
+			return P;
+		}
 }
+
+	
 
 class Pseudo3D
 {
@@ -457,8 +624,8 @@ class Pseudo3D
         Point2D p0, Point2D p1, Point2D p2, Point2D p3)
     {
         int w = image.getWidth();
-        int h = image.getHeight();
-
+        int h = image.getHeight();    
+        
         BufferedImage result =
             new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
@@ -670,3 +837,5 @@ class Pseudo3D
         }
     }
 }
+
+

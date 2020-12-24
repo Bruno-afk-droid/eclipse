@@ -10,8 +10,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public abstract class GameObject {
@@ -29,6 +31,18 @@ public abstract class GameObject {
 	protected double Z_direction = 0;
 	protected double S_direction = 0;
 	public LinkedList<Part> LimpParts = new LinkedList<Part>();
+	protected LinkedList<Polygon> Tetrodon	  = new LinkedList<Polygon>();
+	protected LinkedList<Polygon> TetrodonNow = new LinkedList<Polygon>();
+	protected LinkedList<Integer> TetrodonDirection = new LinkedList<Integer>();
+	protected LinkedList<int[]> TetrodonDepth = new LinkedList<int[]>();
+	protected LinkedList<int[]> TetrodonDepthNow = new LinkedList<int[]>();
+	protected LinkedList<Integer> AvarageTetrodonDepth = new LinkedList<Integer>();
+	protected LinkedList<Integer> AvarageTetrodonDepthNow = new LinkedList<Integer>();
+	protected LinkedList<Polygon> TextureMap = new LinkedList<Polygon>();
+	LinkedList<Polygon> T = new LinkedList<Polygon>();
+	LinkedList<int[]> TD = new LinkedList<int[]>();
+	protected Area HitArea = new Area();
+	protected Polygon HitPolygon = new Polygon();
 	protected GameObject owner;
 	protected GameObject H_owner;
 	protected String ObjectType="Soild";
@@ -57,6 +71,17 @@ public abstract class GameObject {
 		this.px=px;
 		this.py=py;
 		this.pz=pz;
+		this.HitArea = getArea();
+		this.HitPolygon = getBounds();
+		this.Tetrodon = getTertradon(0,0,0);
+		this.TetrodonNow = getTertradon(direction,Z_direction,S_direction);
+		this.TetrodonDepth = getTertradonDepth(0,0);
+		this.AvarageTetrodonDepthNow = getAvarageTertradonDepth(Z_direction, S_direction);
+		this.AvarageTetrodonDepth = getAvarageTertradonDepth(0, 0);
+		this.TetrodonDepthNow= getTertradonDepth(Z_direction,S_direction);
+		this.T = Game.sortOnDepth((LinkedList)Tetrodon.clone(),(LinkedList)AvarageTetrodonDepthNow.clone());
+		this.TD =  Game.sortOnDepthArray((LinkedList)TetrodonDepth.clone(),(LinkedList) AvarageTetrodonDepthNow.clone());
+		this.TextureMap = getTextureMap(T, TD);
 	}
 	
 	public abstract void tick();
@@ -75,12 +100,17 @@ public abstract class GameObject {
 
 		
 		LinkedList<Polygon> Polys = new LinkedList<Polygon>();
+		LinkedList<Integer> Z = new LinkedList<Integer>();
 		
 		
 		int o=0;
 		
 		int[] pX = new int[SW.length];
 		int[] pY = new int[SW.length];
+		int[] pZ = new int[SW.length];
+		double pDirection;
+		
+		
         for(int L=0;L<layers.length;L++) {
         	
     		int[] polX = new int[layers[L]];
@@ -92,7 +122,6 @@ public abstract class GameObject {
     		
     		Point Dpt[] = new Point[polX.length];
     		
-    		Polygon SP = new Polygon();
 	        	for(int i=0;i<layers[L];i++) {	
 					
 				
@@ -111,23 +140,25 @@ public abstract class GameObject {
 				polY[i] = Dpt[i].y;		
 				
 				if(i!=0)
-				if(L!=0) {
-				Polys.add(new Polygon(new int[] {polX[i],pX[i],pX[i-1],polX[i-1]},new int[] {polY[i],pY[i],pY[i-1],polY[i-1]},4));	
+				if(L!=0) 
+				{
+				
+				Polys.add(new Polygon(new int[] {polX[i],pX[i],pX[i-1],polX[i-1]},new int[] {polY[i],pY[i],pY[i-1],polY[i-1]},4));
+				Z.add(Game.Avarage_Array(new int[] {polZ[i],pZ[i],pZ[i-1],polZ[i-1]}, 4));
 				}
 				
 		        	}	
-	        	
+	    
 		Polys.add(new Polygon(polX,polY,polX.length));
-	        	
-
+		Z.add(Game.Avarage_Array(polZ, polZ.length));
+		
 		pX=polX;
 		pY=polY;
+		pZ=polZ;
 		
 			o+=layers[L];
         }
-        	
-        
-        return  Polys;
+        return Polys;
 	}
 
 	public LinkedList<Polygon> getTertradon(double direction,double Z_direction,double S_direction){
@@ -143,12 +174,17 @@ public abstract class GameObject {
 
 		
 		LinkedList<Polygon> Polys = new LinkedList<Polygon>();
+		LinkedList<Integer> Z = new LinkedList<Integer>();
 		
 		
 		int o=0;
 		
 		int[] pX = new int[SW.length];
 		int[] pY = new int[SW.length];
+		int[] pZ = new int[SW.length];
+		double pDirection;
+		
+		
         for(int L=0;L<layers.length;L++) {
         	
     		int[] polX = new int[layers[L]];
@@ -160,7 +196,6 @@ public abstract class GameObject {
     		
     		Point Dpt[] = new Point[polX.length];
     		
-    		Polygon SP = new Polygon();
 	        	for(int i=0;i<layers[L];i++) {	
 					
 				
@@ -179,22 +214,25 @@ public abstract class GameObject {
 				polY[i] = Dpt[i].y;		
 				
 				if(i!=0)
-				if(L!=0) {
-				Polys.add(new Polygon(new int[] {polX[i],pX[i],pX[i-1],polX[i-1]},new int[] {polY[i],pY[i],pY[i-1],polY[i-1]},4));	
+				if(L!=0) 
+				{
+				
+				Polys.add(new Polygon(new int[] {polX[i],pX[i],pX[i-1],polX[i-1]},new int[] {polY[i],pY[i],pY[i-1],polY[i-1]},4));
+				Z.add(Game.Avarage_Array(new int[] {polZ[i],pZ[i],pZ[i-1],polZ[i-1]}, 4));
 				}
 				
 		        	}	
-	        	
+	    
 		Polys.add(new Polygon(polX,polY,polX.length));
-
+		Z.add(Game.Avarage_Array(polZ, polZ.length));
+		
 		pX=polX;
 		pY=polY;
+		pZ=polZ;
 		
 			o+=layers[L];
         }
-        	
-        
-        return  Polys;
+        return Polys;
 	}
 
 	public LinkedList<int[]> getTertradonDepth(double Z_direction,double S_direction){
@@ -210,7 +248,7 @@ public abstract class GameObject {
 
 		
 		LinkedList<int[]> Polys = new LinkedList<int[]>();
-		
+		LinkedList<Integer> Z = new LinkedList<Integer>();
 		
 		int o=0;
 		
@@ -238,7 +276,7 @@ public abstract class GameObject {
 				
 				if(i!=0)
 				if(L!=0) {
-				Polys.add(new int[] {polZ[i],pZ[i],pZ[i-1],polZ[i]});	
+				Polys.add(new int[] {polZ[i],pZ[i],pZ[i-1],polZ[i-1]});	
 				}
 				
 		        	}	
@@ -247,14 +285,122 @@ public abstract class GameObject {
 	        	
 		pZ=polZ;
 		
+			
+		
 			o+=layers[L];
         }
-        	
+        
+
         
         return  Polys;
 	}
 
+	public LinkedList<Integer> getAvarageTertradonDepth(double Z_direction,double S_direction){
 
+
+		/*
+		 {x-16,x+16,x+16,x-16};
+		 {y-16,y-16,y+16,y+16};
+		 */
+		//SD[i] = Math.sqrt(x^2)
+		
+
+
+		
+		LinkedList<Integer> Polys = new LinkedList<Integer>();
+		LinkedList<Integer> Z = new LinkedList<Integer>();
+		
+		int o=0;
+		
+		int[] pZ = new int[SW.length];
+        for(int L=0;L<layers.length;L++) {
+        	
+    		int[] polX = new int[layers[L]];
+    		int[] polY = new int[layers[L]];
+    		int[] polZ = new int[layers[L]];
+    		
+ 
+	        	for(int i=0;i<layers[L];i++) {	
+					
+				
+				polX[i] = SW[i+o];
+				polY[i] = SH[i+o];					
+				
+				polZ[i]= (Game.rotatePoint(new Point(polX[i], SD[i+o]+z),new Point(0,z),Z_direction)).y;
+				polX[i]= (Game.rotatePoint(new Point(polX[i], SD[i+o]+z),new Point(0,z),Z_direction)).x;	
+				
+				int SDZ=polZ[i];		
+			    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(0,z),S_direction)).y;
+				polY[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(0,z),S_direction)).x;				
+						
+				
+				if(i!=0)
+				if(L!=0) {
+				Polys.add(Game.Avarage_Array(new int[] {polZ[i],pZ[i],pZ[i-1],polZ[i-1]}, 4));	
+				}
+				
+		        	}	
+	        	
+		Polys.add(Game.Avarage_Array(polZ, polZ.length));
+	        	
+		pZ=polZ;
+		
+			
+		
+			o+=layers[L];
+        }
+        
+
+        
+        return  Polys;
+	}
+
+	public LinkedList<Polygon> getTextureMap(LinkedList<Polygon> P,LinkedList<int[]> depth){
+		LinkedList<Polygon> result = new LinkedList<Polygon>();
+			for(int i=0;i<P.size();i++) {
+				result.add(Get3DBounds(P.get(i), depth.get(i)));
+			}
+		
+		return result;
+	}
+	
+	public Point2D.Double getAvarageDepthDir(Polygon P,int[] depth,Point PT){
+		Point2D.Double result = new Point2D.Double();
+		int X=0;
+		int Y=0;
+		int Z=0;
+		
+			for(int i=0;i<P.npoints;i++) {
+				X+=P.xpoints[i];
+				Y+=P.ypoints[i];
+				Z+=depth[i];
+			}
+			result.x = Game.getAngle(new Point((X/P.npoints),(Z/P.npoints)), new Point(PT.x,0));
+			result.y = Game.getAngle(new Point((Y/P.npoints),(Z/P.npoints)), new Point(PT.y,0));
+		
+		
+		return result;
+	}
+
+	public void UpdateHitBox() {
+		//LinkedList<Polygon> T = Game.sortOnDepth((LinkedList)Tetrodon.clone(),(LinkedList)AvarageTetrodonDepthNow.clone());
+		//LinkedList<int[]> TD =  Game.sortOnDepthArray((LinkedList)TetrodonDepth.clone(),(LinkedList) AvarageTetrodonDepthNow.clone());
+		this.AvarageTetrodonDepthNow = getAvarageTertradonDepth(Z_direction, S_direction);
+	
+		this.HitArea = getArea();
+		this.HitPolygon = getBounds();
+		
+		this.TetrodonDepth= getTertradonDepth(0,0);
+		this.Tetrodon = getTertradon(0,0,0);
+
+		this.TetrodonDepthNow= getTertradonDepth(Z_direction,S_direction);
+		this.TetrodonNow = getTertradon(direction,Z_direction,S_direction);
+		
+		this.T = Game.sortOnDepth((LinkedList)Tetrodon.clone(),(LinkedList)AvarageTetrodonDepthNow.clone());
+		this.TD =  Game.sortOnDepthArray((LinkedList)TetrodonDepth.clone(),(LinkedList) AvarageTetrodonDepthNow.clone());
+		
+		this.TextureMap = getTextureMap(T, TD);
+	}
 	
 	public Polygon getBounds(){
         return Game.outlineTetrahedron(getTertradon());
@@ -266,7 +412,7 @@ public abstract class GameObject {
 	
 	public Area getAllBounds(){
 		
-		Area A = new Area(getBounds());
+		Area A = new Area(HitPolygon);
 			
 			for(int i=0;i<LimpParts.size();i++) { 
 				GameObject b=LimpParts.get(i);
@@ -277,61 +423,91 @@ public abstract class GameObject {
 
 	}
 	
-	public void render3DImage(BufferedImage Image,Shape P,int[] depth,Graphics2D g2d) {
+	
+	public void render3DImage(BufferedImage Image,Polygon P,int[] depth,Graphics2D g2d) {
 		//Z
 		//S
 		//Direction
-		Rectangle R = P.getBounds();		
-		int rZ = Game.Avarage_Array(depth,depth.length);
-		
-		Point P1 = Game.rotatePoint(new Point(R.x, rZ+z),new Point(x,z),Z_direction);
-		Point P2 = Game.rotatePoint(new Point(R.y, P1.y),new Point(y,z),S_direction);
 
-		Point Pz = Game.rotatePoint(new Point(P1.x,P2.x), new Point (x,y), direction);
-		
-		AffineTransform at = AffineTransform.getTranslateInstance(Pz.x,Pz.y);
-		
-		Point E1 = Game.rotatePoint(new Point((int)R.getWidth()+R.x , rZ+z),new Point(x,z),Z_direction);
-		Point E2 = Game.rotatePoint(new Point(R.y, E1.y),new Point(y,z),S_direction);
-
-		Point Ez = Game.rotatePoint(new Point(E1.x,E2.x), new Point (x,y), direction);
-		
-		double D = Game.getAngle(Pz, Ez);
-		
-		Point S1 = Game.rotatePoint(new Point(R.x, rZ+z),new Point(x,z),Z_direction);
-		Point S2 = Game.rotatePoint(new Point((int)R.getHeight()+R.y,S1.y),new Point(y,z),S_direction);
-
-		Point Sz = Game.rotatePoint(new Point(S1.x,S2.x), new Point (x,y), direction);
-		
-		
-		Point ES1 = Game.rotatePoint(new Point((int)R.getWidth()+R.y, rZ+z),new Point(x,z),Z_direction);
-		Point ES2 = Game.rotatePoint(new Point((int)R.getHeight()+R.y,ES1.y),new Point(y,z),S_direction);
-
-		Point ESz = Game.rotatePoint(new Point(ES1.x,ES2.x), new Point (x,y), direction);
-		
-		double distanceW = -Game.distance(Pz.x, Pz.y, Ez.x, Ez.y);
-		double distanceH = -Game.distance(Pz.x, Pz.y, Sz.x, Sz.y);
-		
-		g2d.draw(new Line2D.Double(Pz,Ez));
-		g2d.draw(new Line2D.Double(Pz,Sz));
-		
-		R.x=Pz.x;
-		R.y=Pz.y;	
-		
-		at.rotate(Math.toRadians(direction-D-90));
-		
-		at.scale((distanceW/(double)Image.getWidth()),1);
-		at.scale(1,(distanceH/(double)Image.getHeight()));
-		
-		
-		
 		//g2d.draw(R);
+		//g2d.draw(P);
+		//if(P.npoints>4)
+		
+
+		if(P!=null) {
+		int MX = Game.Min(P.xpoints); 
+		int MY = Game.Min(P.ypoints);
+		AffineTransform at = AffineTransform.getTranslateInstance(MX,MY);
+		//if(!P.getBounds().isEmpty())
+		//        Polygon P = new Polygon(new int[] {(int) p0.getX(),(int) p1.getX(),(int) p2.getX(),(int) p3.getX()},new int[] {(int) p0.getY(),(int) p1.getY(),(int) p2.getY(),(int) p3.getY()},4);
+	    BufferedImage I = Pseudo3D.computeImage(Image, new Point(P.xpoints[1]-MX,P.ypoints[1]-MY), new Point(P.xpoints[2]-MX,P.ypoints[2]-MY), new Point(P.xpoints[3]-MX,P.ypoints[3]-MY), new Point(P.xpoints[0]-MX,P.ypoints[0]-MY));
+	    g2d.setClip(P);
+		g2d.drawImage(I, at, null);
+		}
+		//g2d.draw(P);
+	}
+
+	
+	public Point2D.Double getPolygonDirecton(int x,int y,int z,Polygon P,int[] depth) {
+		Point center = new Point(x,y);
+		double[] Z_dir = new double[P.npoints];
+		double[] S_dir = new double[P.npoints];
+		
+			for(int i=0;i<P.npoints;i++) {
+				Point PT = new Point(P.xpoints[i],P.ypoints[i]);
+				int   D = depth[i];
+				
+				
+				Z_dir[i] = Game.getAngle(new Point(x,z), new Point(PT.x,D));
+				S_dir[i] = Game.getAngle(new Point(y,z), new Point(PT.y,D));
+				
+			}
 		
 		
+		return new Point2D.Double(
+				Game.Avarage_Array(Z_dir, Z_dir.length),
+				Game.Avarage_Array(S_dir, S_dir.length));
 	}
 	
+	public Polygon TurnPolygon(int x,int y,int z,Polygon P,int[] depth,double direction, double Z_direction,double S_direction) {
+		
+		
+		int[] polX = new int[P.npoints];
+		int[] polY = new int[P.npoints];
+		int[] polZ = new int[P.npoints];
+		Point Dpt[] = new Point[polX.length];
+		
+		for(int i=0;i<P.npoints;i++) {
+		polX[i] = P.xpoints[i];
+		polY[i] = P.ypoints[i];				
+		
+		polZ[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).y;
+		polX[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).x;	
+		
+		int SDZ=polZ[i];		
+	    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).y;
+		polY[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).x;				
+			
+		Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
+		polX[i] = Dpt[i].x;
+		polY[i] = Dpt[i].y;	
+		}
+		
+		return new Polygon(polX,polY,P.npoints); 
+	}
 
+	public Polygon Get3DBounds(Polygon P,int[] depth) {
 
+		Point M = new Point(Game.Avarage_Array(P.xpoints, P.npoints),Game.Avarage_Array(P.ypoints, P.npoints));
+		
+		Rectangle R = P.getBounds();
+		if(P.npoints!=4)
+		P = Game.RectangleToPolygon(R);
+		
+		
+		return TurnPolygon(x,y,z,P,depth, direction,Z_direction,S_direction);
+
+	}
 
 	
 public Area getAllArea(){
@@ -352,6 +528,7 @@ public Area getAllArea(){
 			Part tempObject = LimpParts.get(i);
 			
 			tempObject.tick();
+			tempObject.UpdateHitBox();
 		}
 	}
 	
@@ -419,21 +596,21 @@ public Area getAllArea(){
 				if(tempObject.getId() == ID.Ground) {		
 							
 							
-							for(int p=0;p<tempObject.getBounds().xpoints.length-1;p++) {
+							for(int p=0;p<tempObject.HitPolygon.xpoints.length-1;p++) {
 								
 								int b;
-								if(p+1 > tempObject.getBounds().xpoints.length-1)
+								if(p+1 > tempObject.HitPolygon.xpoints.length-1)
 								b=-p;else b=1;
 								
-								int[] pX = {tempObject.getBounds().xpoints[p],
-											tempObject.getBounds().xpoints[p+b],
-											tempObject.getBounds().xpoints[p]+1,
-											tempObject.getBounds().xpoints[p+b]+1};
+								int[] pX = {tempObject.HitPolygon.xpoints[p],
+											tempObject.HitPolygon.xpoints[p+b],
+											tempObject.HitPolygon.xpoints[p]+1,
+											tempObject.HitPolygon.xpoints[p+b]+1};
 											
-								int[] pY = {tempObject.getBounds().ypoints[p],
-											tempObject.getBounds().ypoints[p+b],
-											tempObject.getBounds().ypoints[p]+1,
-											tempObject.getBounds().ypoints[p+b]+1};
+								int[] pY = {tempObject.HitPolygon.ypoints[p],
+											tempObject.HitPolygon.ypoints[p+b],
+											tempObject.HitPolygon.ypoints[p]+1,
+											tempObject.HitPolygon.ypoints[p+b]+1};
 								
 								
 								
@@ -452,10 +629,14 @@ public Area getAllArea(){
 								
 								
 								
-								if(testIntersection(getAllArea(),new Polygon(pX,pY,pX.length))) {
+								if(testIntersection(HitArea,new Polygon(pX,pY,pX.length))) {
 									CL = true;
 									GameObject O=owner;
-									while(testIntersection(getAllArea(),new Polygon(pX,pY,pX.length))){	
+									
+									Polygon P=new Polygon(pX,pY,pX.length);
+									int cx = x;
+									int cy = y;
+									while(testIntersection(HitArea,Game.MovePolygon(P,(cx-x),(cy-y)))){	
 
 																						
 											if(Game.inDeg(dir, 315, 45)) {
@@ -505,7 +686,7 @@ public Area getAllArea(){
 													O.x++;
 													O=O.owner;}
 											}
-											
+					
 										}
 									
 									}

@@ -53,8 +53,14 @@ public class Ground extends GameObject {
 	}
 	
 	public void tick() {
-			if(Game.BUp)direction++;
-			if(Game.BDown)direction--;
+		
+		HitArea = getArea();
+		HitPolygon = getBounds();
+		
+		TetrodonDepthNow= getTertradonDepth(Z_direction,S_direction);
+		TetrodonNow = getTertradon(direction,Z_direction,S_direction);
+			//if(Game.BUp)direction++;
+			//if(Game.BDown)direction--;
 
 	}
 	

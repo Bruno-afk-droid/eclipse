@@ -102,21 +102,21 @@ public abstract class Part extends GameObject{
 				if(tempObject.getId() == ID.Ground) {		
 							
 							
-							for(int p=0;p<tempObject.getBounds().xpoints.length-1;p++) {
+							for(int p=0;p<tempObject.HitPolygon.xpoints.length-1;p++) {
 								
 								int b;
-								if(p+1 > tempObject.getBounds().xpoints.length-1)
+								if(p+1 > tempObject.HitPolygon.xpoints.length-1)
 								b=-p;else b=1;
 								
-								int[] pX = {tempObject.getBounds().xpoints[p],
-											tempObject.getBounds().xpoints[p+b],
-											tempObject.getBounds().xpoints[p]+1,
-											tempObject.getBounds().xpoints[p+b]+1};
+								int[] pX = {tempObject.HitPolygon.xpoints[p],
+											tempObject.HitPolygon.xpoints[p+b],
+											tempObject.HitPolygon.xpoints[p]+1,
+											tempObject.HitPolygon.xpoints[p+b]+1};
 											
-								int[] pY = {tempObject.getBounds().ypoints[p],
-											tempObject.getBounds().ypoints[p+b],
-											tempObject.getBounds().ypoints[p]+1,
-											tempObject.getBounds().ypoints[p+b]+1};
+								int[] pY = {tempObject.HitPolygon.ypoints[p],
+											tempObject.HitPolygon.ypoints[p+b],
+											tempObject.HitPolygon.ypoints[p]+1,
+											tempObject.HitPolygon.ypoints[p+b]+1};
 								
 								
 								

@@ -11,6 +11,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
@@ -35,7 +36,7 @@ public class Player extends GameObject {
 		this.handler = handler;
 		this.ObjectType="MOB";
 		this.texture = LoadImage("GameDebugImage.png");
-
+		this.texture = Game.resize(texture, (int)(texture.getWidth()*1.5), (int)(texture.getHeight()*1.5));
 
 		weight = 100;
 
@@ -65,7 +66,7 @@ public class Player extends GameObject {
 		int[] YN=  {0,0,-2,-7,-7,-2};
 		 */
 		
-		addPart(new Hip(x,y-8,X,Y,null,null, ID.Hip, 0,11,0,this,handler));
+		//addPart(new Hip(x,y-8,X,Y,null,null, ID.Hip, 0,11,0,this,handler));
 		//addPart(new shoulder(x,y-8,XR,YR,null,ID.shoulder, -16,-10,0,this,handler));
 		//addPart(new shoulder(x,y-8,XL,YL,null,ID.shoulder,  16,-10,0,this,handler));
 		//addPart(new neck(x,y-8,XN,YN,null,ID.neck, 0,-20,0,this,handler));
@@ -77,22 +78,29 @@ public class Player extends GameObject {
 
 	public void tick() {	
 		
+		
 		//if(Game.BLeft == true)hsp=-5;else 
 		//if(Game.BRight == true)hsp=5;else hsp=0;
 				
 		grv +=HUD.GRAVITY*(weight/50);
 		if(vsp > 10)
 		grv = 0;
-		vsp += grv;
+		//vsp += grv;
 					
 		direction=Game.Deg(direction+dsp);
 		Z_direction=Game.Deg(Z_direction);
 		
 		
-		direction=0;
+		//direction++;
 		if(Game.BLeft == true)
-		S_direction++; else S_direction = 0;
-		Z_direction=45;
+		Z_direction++; 
+		if(Game.BRight == true)
+		Z_direction--;
+		
+		if(Game.BUp == true)		
+		S_direction++; 
+		if(Game.BDown == true)
+		S_direction--;
 		/*
 		if(Game.BDown == true)
 		S_direction--;
@@ -350,27 +358,27 @@ public class Player extends GameObject {
 
 	public void render(Graphics g) {
 		
-		//BufferedImage Skin = LoadImage("blok.png");
-		
 		AffineTransform at = AffineTransform.getTranslateInstance(x,y);
 		at.rotate(Math.toRadians(direction), texture.getWidth()/2, texture.getHeight()/2); 
 		Graphics2D g2d = (Graphics2D) g;
+		int D=0;
 		
-		
-		//g2d.drawImage(texture, at, null);
-		LinkedList<Polygon> T = getTertradon(0,0,0);
-		LinkedList<int[]> TD = getTertradonDepth(Z_direction,S_direction);
-		//for(int i=0;i<T.size();i++) {
-		Polygon P = T.get(0);
-		//render3DImage(texture,P,TD.get(0),g2d);
-		//g2d.draw(T.get(0));
-		//}
-		//g.setColor(Color.blue);
-		//g2d.fill(getBounds());
-		g.setColor(Color.red);
-		g2d.draw(getArea());
+		//for(int n=0;n<1;n++)
+		for(int i=0;i<T.size();i++) {		
+		Polygon P = TextureMap.get(i);
+		//Point2D.Double DIR = getAvarageDepthDir(P, TD.get(i), new Point(x,y));
+
+			
+			render3DImage(texture,P,TD.get(i),g2d);	
+			
+			D++;
+		}//System.out.println(D);
+		//g2d.setClip(null);
+		//g2d.draw(HitArea);
+		//g.setColor(Color.red);
 		//g2d.drawImage(texture,0,0,10+x,10+y,null);
-		g2d.drawImage(Pseudo3D.computeImage(texture, new Point(50,0), new Point(0,0), new Point(0,50), new Point(50,50)), null, null);
+		//for(int i=0;i<30;i++)
+		
 		//renderPart(g);
 		}
 	
@@ -391,6 +399,6 @@ public class Player extends GameObject {
 	
 
 
-
+	
 	
 }
