@@ -33,7 +33,7 @@ public abstract class GameObject {
 	public LinkedList<Part> LimpParts = new LinkedList<Part>();
 	protected LinkedList<Polygon> Tetrodon	  = new LinkedList<Polygon>();
 	protected LinkedList<Polygon> TetrodonNow = new LinkedList<Polygon>();
-	protected LinkedList<Integer> TetrodonDirection = new LinkedList<Integer>();
+	protected LinkedList<Point2D.Double> TetrodonDirection = new LinkedList<Point2D.Double>();
 	protected LinkedList<int[]> TetrodonDepth = new LinkedList<int[]>();
 	protected LinkedList<int[]> TetrodonDepthNow = new LinkedList<int[]>();
 	protected LinkedList<Integer> AvarageTetrodonDepth = new LinkedList<Integer>();
@@ -182,8 +182,8 @@ public abstract class GameObject {
 		int[] pX = new int[SW.length];
 		int[] pY = new int[SW.length];
 		int[] pZ = new int[SW.length];
-		double pDirection;
-		
+		LinkedList<Point2D.Double> DIR = new LinkedList<Point2D.Double>();
+		//TetrodonDirection
 		
         for(int L=0;L<layers.length;L++) {
         	
@@ -390,9 +390,6 @@ public abstract class GameObject {
 		this.HitArea = getArea();
 		this.HitPolygon = getBounds();
 		
-		this.TetrodonDepth= getTertradonDepth(0,0);
-		this.Tetrodon = getTertradon(0,0,0);
-
 		this.TetrodonDepthNow= getTertradonDepth(Z_direction,S_direction);
 		this.TetrodonNow = getTertradon(direction,Z_direction,S_direction);
 		
@@ -439,17 +436,19 @@ public abstract class GameObject {
 		int MY = Game.Min(P.ypoints);
 		AffineTransform at = AffineTransform.getTranslateInstance(MX,MY);
 		//if(!P.getBounds().isEmpty())
-		//        Polygon P = new Polygon(new int[] {(int) p0.getX(),(int) p1.getX(),(int) p2.getX(),(int) p3.getX()},new int[] {(int) p0.getY(),(int) p1.getY(),(int) p2.getY(),(int) p3.getY()},4);
+		
 	    BufferedImage I = Pseudo3D.computeImage(Image, new Point(P.xpoints[1]-MX,P.ypoints[1]-MY), new Point(P.xpoints[2]-MX,P.ypoints[2]-MY), new Point(P.xpoints[3]-MX,P.ypoints[3]-MY), new Point(P.xpoints[0]-MX,P.ypoints[0]-MY));
+		//g2d.draw(new Polygon(P.xpoints,P.ypoints,P.npoints));
 	    g2d.setClip(P);
 		g2d.drawImage(I, at, null);
+		g2d.setClip(null);
 		}
 		//g2d.draw(P);
 	}
 
 	
-	public Point2D.Double getPolygonDirecton(int x,int y,int z,Polygon P,int[] depth) {
-		Point center = new Point(x,y);
+	public Point2D.Double getPolygonDirecton(Point center,Polygon P,int[] depth) {
+		int   centerDepth = z;
 		double[] Z_dir = new double[P.npoints];
 		double[] S_dir = new double[P.npoints];
 		
@@ -458,8 +457,8 @@ public abstract class GameObject {
 				int   D = depth[i];
 				
 				
-				Z_dir[i] = Game.getAngle(new Point(x,z), new Point(PT.x,D));
-				S_dir[i] = Game.getAngle(new Point(y,z), new Point(PT.y,D));
+				Z_dir[i] = Game.getAngle(new Point(center.x,centerDepth), new Point(PT.x,D));
+				S_dir[i] = Game.getAngle(new Point(center.y,centerDepth), new Point(PT.y,D));
 				
 			}
 		
@@ -471,6 +470,7 @@ public abstract class GameObject {
 	
 	public Polygon TurnPolygon(int x,int y,int z,Polygon P,int[] depth,double direction, double Z_direction,double S_direction) {
 		
+		int[] D = depth;
 		
 		int[] polX = new int[P.npoints];
 		int[] polY = new int[P.npoints];
@@ -481,8 +481,8 @@ public abstract class GameObject {
 		polX[i] = P.xpoints[i];
 		polY[i] = P.ypoints[i];				
 		
-		polZ[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).y;
-		polX[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).x;	
+		polZ[i]= (Game.rotatePoint(new Point(polX[i], D[i]),new Point(x,z),Z_direction)).y;
+		polX[i]= (Game.rotatePoint(new Point(polX[i], D[i]),new Point(x,z),Z_direction)).x;	
 		
 		int SDZ=polZ[i];		
 	    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).y;
@@ -496,19 +496,156 @@ public abstract class GameObject {
 		return new Polygon(polX,polY,P.npoints); 
 	}
 
+	public int[] TurnPolygonDepth(int x,int y,int z,Polygon P,int[] depth,double direction, double Z_direction,double S_direction) {
+		
+		
+		int[] polX = new int[P.npoints];
+		int[] polY = new int[P.npoints];
+		int[] polZ = new int[P.npoints];
+		
+		for(int i=0;i<P.npoints;i++) {
+		polX[i] = P.xpoints[i];
+		polY[i] = P.ypoints[i];				
+		
+		polZ[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).y;
+		polX[i]= (Game.rotatePoint(new Point(polX[i], depth[i]),new Point(x,z),Z_direction)).x;	
+		
+		int SDZ=polZ[i];		
+	    polZ[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).y;
+		polY[i]= (Game.rotatePoint(new Point(polY[i], SDZ),new Point(y,z),S_direction)).x;				
+			
+		}
+		
+		return polZ; 
+	}
+	
+	public Polygon TurnPolygonBack(int x,int y,int z,Polygon P,int[] depth,double direction, double Z_direction,double S_direction) {
+		
+		
+		int[] polX = new int[P.npoints];
+		int[] polY = new int[P.npoints];
+		int[] polZ = new int[P.npoints];
+		Point Dpt[] = new Point[polX.length];
+		
+		for(int i=0;i<P.npoints;i++) {
+		polX[i] = P.xpoints[i];
+		polY[i] = P.ypoints[i];	
+		
+		Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
+		polX[i] = Dpt[i].x;
+		polY[i] = Dpt[i].y;	
+		
+	    polZ[i]= (Game.rotatePoint(new Point(polY[i], depth[i]),new Point(y,z),S_direction)).y;
+		polY[i]= (Game.rotatePoint(new Point(polY[i], depth[i]),new Point(y,z),S_direction)).x;
+		
+		int SDZ=polZ[i];
+		polZ[i]= (Game.rotatePoint(new Point(polX[i], SDZ),new Point(x,z),Z_direction)).y;
+		polX[i]= (Game.rotatePoint(new Point(polX[i], SDZ),new Point(x,z),Z_direction)).x;	
+				
+			
+		}
+		
+		return new Polygon(polX,polY,P.npoints); 
+	}
+	
+	public int[] TurnPolygonDepthBack(int x,int y,int z,Polygon P,int[] depth,double direction, double Z_direction,double S_direction) {
+		
+		
+		int[] polX = new int[P.npoints];
+		int[] polY = new int[P.npoints];
+		int[] polZ = new int[P.npoints];
+		Point Dpt[] = new Point[polX.length];
+		
+		for(int i=0;i<P.npoints;i++) {
+		polX[i] = P.xpoints[i];
+		polY[i] = P.ypoints[i];	
+		
+		Dpt[i] = (Game.rotatePoint(new Point(polX[i], polY[i]),new Point(x,y),direction));
+		polX[i] = Dpt[i].x;
+		polY[i] = Dpt[i].y;	
+		
+	    polZ[i]= (Game.rotatePoint(new Point(polY[i], depth[i]),new Point(y,z),S_direction)).y;
+		polY[i]= (Game.rotatePoint(new Point(polY[i], depth[i]),new Point(y,z),S_direction)).x;
+		
+		int SDZ=polZ[i];
+		polZ[i]= (Game.rotatePoint(new Point(polX[i], SDZ),new Point(x,z),Z_direction)).y;
+		polX[i]= (Game.rotatePoint(new Point(polX[i], SDZ),new Point(x,z),Z_direction)).x;	
+				
+			
+		}
+		
+		return polZ;
+	}
+	
 	public Polygon Get3DBounds(Polygon P,int[] depth) {
-
-		Point M = new Point(Game.Avarage_Array(P.xpoints, P.npoints),Game.Avarage_Array(P.ypoints, P.npoints));
+		//int D = Game.Avarage_Array(depth, depth.length);
+		int[] DP = depth;
+		Polygon Poly = P;
+			 
 		
-		Rectangle R = P.getBounds();
+		
+		
+		//System.out.println(Game.Avarage_Array(depth,depth.length));
+		//Poly = TurnPolygonBack(C.x, C.y, D, Game.RectangleToPolygon(R), DP, 0, Game.Deg(-DIR1), Game.Deg(DIR2));
+		//DP   = TurnPolygonDepthBack(C.x, C.y, D, Game.RectangleToPolygon(R), DP, 0,Game.Deg(-DIR1), Game.Deg(DIR2));
+		
 		if(P.npoints!=4)
-		P = Game.RectangleToPolygon(R);
+		Poly = new Polygon();
+			
+		if(Poly.npoints!=0)
+		return TurnPolygon(x,y,z,Poly,DP, direction,Z_direction,S_direction); else
+		return new Polygon();
 		
-		
-		return TurnPolygon(x,y,z,P,depth, direction,Z_direction,S_direction);
 
 	}
+	public Polygon GetMinimumBounds(Polygon P) {
+		int[] D = new int[P.npoints];
+		for(int i=0;i<P.npoints;i++)
+		D[i] = 0;
+			
+		double DIR=0;
+		Rectangle Rel = P.getBounds();
+		Polygon result = Game.RectangleToPolygon(Rel);
+		double size = Rel.getWidth()*Rel.getHeight();
+			for(int i=1;i<P.npoints;i++) {
+				DIR = Game.getAngle(new Point(P.xpoints[i-1],P.ypoints[i-1]), new Point(P.xpoints[i],P.ypoints[i]));
+				Rectangle R = TurnPolygon(P.xpoints[i-1], P.ypoints[i-1], 0, P, D, DIR, 0, 0).getBounds();
+					if(R.getWidth()*R.getHeight()<=size) {
+						size = R.getWidth()*R.getHeight();
+						result = TurnPolygon(P.xpoints[i-1], P.ypoints[i-1], 0, Game.RectangleToPolygon((TurnPolygon(P.xpoints[i-1], P.ypoints[i-1], 0, P, D, DIR, 0, 0).getBounds())), D, -DIR, 0, 0);
+					}
+					
+			}
+		
+		return result;
+	}
 
+	public Polygon MakeFlat(Polygon P, int[] depth) {
+		int[] D = depth;
+		Polygon result = P;
+		
+		int Dmin = Game.MinIndex(depth);
+		int Dmax = Game.MaxIndex(depth);
+		
+		Point P1 = new Point(P.xpoints[Dmin],depth[Dmin]);
+		Point P2 = new Point(P.xpoints[Dmax],depth[Dmax]);
+	  double Dir = Game.getAngle(P1, P2);
+	  
+	  //if(Dir!=0)
+		  result = TurnPolygon(P.xpoints[Dmin], P.ypoints[Dmin], depth[Dmin], result, depth, 0, Dir, 0);
+		
+		Dmin = Game.MinIndex(depth);
+		Dmax = Game.MaxIndex(depth);
+		
+		 P1 = new Point(P.ypoints[Dmin],depth[Dmin]);
+		 P2 = new Point(P.ypoints[Dmax],depth[Dmax]);
+		 Dir = Game.getAngle(P1, P2);
+		 
+	  //if(Dir!=0)
+		  result = TurnPolygon(P.xpoints[Dmin], P.ypoints[Dmin], depth[Dmin], result, depth, 0, 0, Dir);	 
+	  
+		   return result;
+	}
 	
 public Area getAllArea(){
 		

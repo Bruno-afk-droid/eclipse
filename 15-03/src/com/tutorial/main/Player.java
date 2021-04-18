@@ -368,12 +368,16 @@ public class Player extends GameObject {
 		Polygon P = TextureMap.get(i);
 		//Point2D.Double DIR = getAvarageDepthDir(P, TD.get(i), new Point(x,y));
 
-			
+			//g2d.setColor(Color.BLUE);
 			render3DImage(texture,P,TD.get(i),g2d);	
+			//g2d.draw(MakeFlat(new Polygon(new int[] {100,200,200,100},new int[] {100,100,200,200},4), new int[] {0,100,100,0}));
+			g2d.setColor(Color.RED);
+			//g2d.draw(TetrodonNow.get(i));
 			
 			D++;
 		}//System.out.println(D);
-		//g2d.setClip(null);
+		g2d.setClip(null);
+
 		//g2d.draw(HitArea);
 		//g.setColor(Color.red);
 		//g2d.drawImage(texture,0,0,10+x,10+y,null);

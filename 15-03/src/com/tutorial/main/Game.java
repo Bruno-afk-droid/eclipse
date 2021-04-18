@@ -10,17 +10,22 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -42,6 +47,9 @@ public class Game extends Canvas implements Runnable{
 	public static boolean BRight = false;
 	public static boolean BDown = false;
 	public static boolean BSpace = false;
+	public static Wireframe3D test = new Wireframe3D();;
+	
+	
 	
 	//test
 	
@@ -52,6 +60,26 @@ public class Game extends Canvas implements Runnable{
 	private HUD hud;
 	
 	public Game() {
+		
+		
+		
+		LinkedList<Polygon3D> P3D = new LinkedList<Polygon3D>();
+		for(int i=0;i<5;i++) {
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {16,-16,-16,16}, new int[] {-16,-16,16,16},new int[] {-8,-8,-8,-8}, 4, 0));
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {16,-16,-16,16}, new int[] {-16,-16,16,16},new int[] {8,8,8,8}, 4, 0));
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {16,16,16,16}  , new int[] {-16,-16,16,16}  ,new int[] {8,-8,-8,8}, 4, 0));
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {-16,-16,-16,-16}  , new int[] {-16,-16,16,16}  ,new int[] {8,-8,-8,8}, 4, 0));
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {-16,-16,16,16}  , new int[] {16,16,16,16}  ,new int[] {8,-8,-8,8}, 4, 0));
+		P3D.add(new Polygon3D(100, 100, 0, new int[] {-16,-16,16,16}  , new int[] {-16,-16,-16,-16}  ,new int[] {8,-8,-8,8}, 4, 0));
+		}
+		
+		
+		LinkedList<BufferedImage> B = new LinkedList<BufferedImage>();
+		for(long i=0;i<P3D.size();i++)
+		B.add(LoadImage("GameDebugImage.png"));
+			
+		test = new Wireframe3D(100, 100, 0, P3D,B);
+		
 		handler = new Handler();
 		this.addKeyListener(new KeyInput(handler));
 		
@@ -63,10 +91,10 @@ public class Game extends Canvas implements Runnable{
 		int[] pX = {WIDTH/2*-1,WIDTH/4*-1,0,WIDTH/4,WIDTH/2,WIDTH/2*-1};
 		int[] pY = {0,-128,-64,-128,0,0};
 		
-			handler.addObject(new Ground(WIDTH/2, HEIGHT/3*2,pX, pY, null, null, ID.Ground, 0, 0, 0, handler));
+			//handler.addObject(new Ground(WIDTH/2, HEIGHT/3*2,pX, pY, null, null, ID.Ground, 0, 0, 0, handler));
 			
 			
-			/*
+			
 			int[] X = {16,-16,-16,16,16,-16,-16,16};
 			
 			int[] Y=  {-16,-16,16,16,-16,-16,16,16};
@@ -74,25 +102,25 @@ public class Game extends Canvas implements Runnable{
 			int[] Z=  {-8,-8,-8,-8,8,8,8,8};
 			
 			int[] L=  {4,4};
-			*/
 			
+			/*
 			int[] X = {-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10
 					  ,-10,-11,-16,-16,-6 ,6  ,16 ,16,11,10,0,-10};
 			
 			int[] Y=  {7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7
 					  ,7  ,1  ,-4 ,-16,-20,-20,-16,-4,1 ,7,11,7};
 			
-			int[] Z=  {-20,-20,-20,-20,-20,-20,-20,-20,-20,-20,-20,-20
-				       ,20,20,20,20,20,20,20,20,20,20,20,20};
+			int[] Z=  {-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5,-5
+				       ,5,5,5,5,5,5,5,5,5,5,5,5};
 			
 			int[] L=  {12,X.length/2};
-			 
-		for(int i=0;i<1;i++)
-		handler.addObject(new Player(WIDTH/2-64-1, HEIGHT/2-64,X,Y, Z, L, ID.Player, 0, 0, 0, handler));
+			 */
 
-		 
+
+
 		
-		
+		//for(int i=0;i<1;i++)
+		//handler.addObject(new Player(WIDTH/2-64-1, HEIGHT/2-64,X,Y, Z, L, ID.Player, 0, 0, 0, handler));
 
 	}
 	
@@ -117,7 +145,7 @@ public class Game extends Canvas implements Runnable{
 	public void run() {
 		this.requestFocus();
 		long lastTime = System.nanoTime();
-		double amountOfTricks = 60.0;
+		double amountOfTricks = 120.0;
 		double ns = 1000000000 / amountOfTricks;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
@@ -159,7 +187,7 @@ public class Game extends Canvas implements Runnable{
 		
 		Graphics g = bs.getDrawGraphics();
 		
-		g.setColor(Color.WHITE);
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		handler.render(g);
@@ -169,8 +197,23 @@ public class Game extends Canvas implements Runnable{
 		g.dispose();
 		bs.show();
 	}
-	
 
+	
+		public static int setPossitive(int a) {
+			if(sign(a)==1)
+			return a; else
+			return-a;
+		}
+	
+		public static int getClosedIndex(int[] a,int R) {
+			int result=0;
+			
+			for(int i=0;i<a.length;i++) 
+			if(setPossitive(a[i]-R)<setPossitive(a[result]-R))result=a[i];
+			
+			
+			return result;	
+		}
 	
 		public static int clamp(int var, int min, int max) {
 			if(var >= max)
@@ -215,7 +258,7 @@ public class Game extends Canvas implements Runnable{
 		public static Point rotatePoint(Point pt, Point center, double angleDeg) {
 	        // http://en.wikipedia.org/wiki/Rotation_matrix
 	        
-	        double angleRad = Math.toRadians(angleDeg);
+	        double angleRad = Math.toRadians(Game.Deg(angleDeg));
 	        double cosThetha = Math.cos(angleRad); //The angle COS
 	        double sinThetha = Math.sin(angleRad); //The angle SIN
 	        double dx = (pt.x - center.x); //Difference (Point in transformed to origo)
@@ -244,8 +287,8 @@ public class Game extends Canvas implements Runnable{
 		
 		public static int MinIndex(int[] A) {
 			int I=0;
-			if(A.length==1)return 0;
-			int M=A[1];
+			if(A.length==0)return 0;
+			int M=A[0];
 			for(int i=0;i<A.length;i++) {
 				if(A[i]>M) {M=A[i];
 				I=i;}
@@ -258,8 +301,8 @@ public class Game extends Canvas implements Runnable{
 		
 		public static int MaxIndex(int[] A) {
 			int I=0;
-			if(A.length==1)return 0;
-			int M=A[1];
+			if(A.length==0)return 0;
+			int M=A[0];
 			for(int i=0;i<A.length;i++) {
 				if(A[i]>M) {M=A[i];
 				I=i;}
@@ -267,6 +310,8 @@ public class Game extends Canvas implements Runnable{
 			
 			return I;
 		}
+		
+		
 		
 		public static int Max(int[] A) {
 			if(A==null)return 0;
@@ -320,6 +365,71 @@ public class Game extends Canvas implements Runnable{
 			return I;
 		}		
 		
+		public static Point GetClose(Point Pt,Polygon P) {
+			Point Result = Pt;
+			double distance=0;
+			
+			for(int i=0;i<P.npoints;i++) {
+				if((Game.distance(Pt.x, Pt.y, P.xpoints[i], P.ypoints[i])<distance)||(distance==0))
+					Result = new Point(P.xpoints[i],P.ypoints[i]);
+			}
+			
+			return Result;
+		}
+		
+		public static int[] GetAllIndexInRadias(Point PT,double D,Polygon P) {
+			int[] Result = new int[P.npoints];
+			int c=0;
+			for(int i=0;i<P.npoints;i++) {
+				if(Game.distance(PT.x, PT.y, P.xpoints[i], P.ypoints[i])<=D) {
+					Result[c]=i;
+					c++;
+				}
+			}
+			
+			return Result;
+		}
+		
+		public static int GetCloseIndex(Point Pt,Polygon P) {
+			int Result = 0;
+			double distance=0;
+			
+			for(int i=0;i<P.npoints;i++) {
+				if((Game.distance(Pt.x, Pt.y, P.xpoints[i], P.ypoints[i])<distance)||(distance==0))
+					Result = i;
+			}
+			
+			return Result;
+		}
+		
+		public static Polygon FilterInRect(Polygon P,Rectangle R) {
+			Polygon result = new Polygon();
+			
+			for(int i=0;i<P.npoints;i++) 
+			if(R.contains(P.xpoints[i],P.ypoints[i]))result.addPoint(P.xpoints[i],P.ypoints[i]);
+			
+		return result;
+		}
+		
+		public static int[] FilterInRectIndex(Polygon P,Rectangle R) {
+			int[] result = new int[P.npoints];
+			int k=0;
+			for(int i=0;i<P.npoints;i++) {
+			if(R.contains(P.xpoints[i],P.ypoints[i])) {result[k]=i;
+			k++;}
+			}
+			
+		return result;
+		}
+		
+		public static int[] IndexToArray(int[] index,int[] array) {
+			int[] result = new int[index.length];
+			for(int i=0;i<index.length;i++)
+				result[i]=array[index[i]];
+			
+			return result;
+		}
+		
 		public static float getAngle(Point center,Point target) {
 		    float angle = (float) (Math.atan2(target.y - center.y, target.x - center.x)* 180 / Math.PI);
 
@@ -327,10 +437,14 @@ public class Game extends Canvas implements Runnable{
 		        angle += 360;
 		    }
 
-		    return angle;
+		    return (float) Deg(angle);
 		}
 		
-		
+		public static int ABS(int V){
+			if(Game.sign(V)!=-1)
+			return V; else
+			return-V;
+		}
 
 		public static double Deg(double D) {
 			while(D>=360)D-=360;
@@ -344,6 +458,14 @@ public class Game extends Canvas implements Runnable{
 			return D;
 		}
 		
+		public static int Avg(int[] N) {
+			int AV=0;
+			for(int i=0;i<N.length;i++) {
+			AV+=N[i];	
+			}
+			
+			return AV/N.length;
+		}
 		
 		public static int Avarage_Array(int[] j,int L) {
 			int AV=0;
@@ -374,6 +496,21 @@ public class Game extends Canvas implements Runnable{
 			else return 1;
 		}
 		
+		public static double AvarageDirection(Point P,int[] x,int[] y) {
+			double result=0;
+				for(int i=0;i<x.length;i++) {
+					result+=getAngle(P, new Point(x[i],y[i]));
+				}
+			
+			return Deg(result/x.length);		
+		}
+		
+		public static int[] setAll(int[] a,int n) {
+			for(int i=0;i<a.length;i++) 
+				a[i]=n;
+			return a;	
+		}
+		
 		public static int[] Array_to_ArrayList(LinkedList<Integer> A) {
 			int[] R = new int[A.size()];
 			for(int i=0;i<A.size();i++) {
@@ -388,6 +525,8 @@ public class Game extends Canvas implements Runnable{
 			R.add(A[i]);
 			return R;
 		}
+		
+
 		
 		public static int[] Array_Clamp(int[] A,int B,int E) {
 			int[] R= new int[E];
@@ -564,16 +703,6 @@ public class Game extends Canvas implements Runnable{
 		return after;
 		}
 		
-		public static BufferedImage resize(BufferedImage img, int newW, int newH) { 
-		    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
-		    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-		    Graphics2D g2d = dimg.createGraphics();
-		    g2d.drawImage(tmp, 0, 0, null);
-		    g2d.dispose();
-
-		    return dimg;
-		}  
 		
 		public static LinkedList<Polygon> shortOnDepth(LinkedList<int[]> Depth,LinkedList<Polygon> P){
 			int[] D = new int[Depth.size()];
@@ -613,6 +742,49 @@ public class Game extends Canvas implements Runnable{
 			
 			return P;
 		}
+		
+		public static Polygon GetPolygonMinimunbounds(Polygon P) {
+			List<Point2D> points = ConvertPolygontoPoints(P);
+			points = MinOrientedBoundingBoxComputer.computeCorners(points);
+				Polygon Poly = new Polygon();
+				for(int i=0;i<points.size();i++) {
+					Poly.addPoint((int)points.get(i).getX(), (int)points.get(i).getY());
+				}
+			
+			return Poly;
+		}
+		
+		public static List<Point2D> ConvertPolygontoPoints(Polygon P){
+			List<Point2D> points = new ArrayList<Point2D>();
+				for(int i=0;i<P.npoints;i++) {
+					points.add(new Point(P.xpoints[i],P.ypoints[i]));
+				}
+			return points;	
+		}
+		
+		BufferedImage LoadImage(String FileName) 
+		{
+			BufferedImage img = null;
+			
+			try {
+			img = ImageIO.read(getClass().getResourceAsStream("/"+FileName));
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
+			
+			return img;
+		}
+		
+		public static BufferedImage resize(BufferedImage img, int newW, int newH) { 
+		    Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+		    BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+		    Graphics2D g2d = dimg.createGraphics();
+		    g2d.drawImage(tmp, 0, 0, null);
+		    g2d.dispose();
+
+		    return dimg;
+		}  
 }
 
 	
@@ -837,5 +1009,257 @@ class Pseudo3D
         }
     }
 }
+
+class MinOrientedBoundingBoxComputer
+{
+    static List<Point2D> computeCorners(List<Point2D> points)
+    {
+        List<Point2D> convexHullPoints = 
+            computeConvexHullPoints(points);
+        int alignmentPointIndex = 
+            computeAlignmentPointIndex(convexHullPoints);
+        Rectangle2D r = computeAlignedBounds(
+            convexHullPoints, alignmentPointIndex);
+
+        List<Point2D> alignedCorners = new ArrayList<Point2D>();
+        alignedCorners.add(new Point2D.Double(r.getMinX(), r.getMinY()));
+        alignedCorners.add(new Point2D.Double(r.getMaxX(), r.getMinY()));
+        alignedCorners.add(new Point2D.Double(r.getMaxX(), r.getMaxY()));
+        alignedCorners.add(new Point2D.Double(r.getMinX(), r.getMaxY()));
+
+        Point2D center = convexHullPoints.get(alignmentPointIndex);
+        double angleRad = computeEdgeAngleRad(
+            convexHullPoints, alignmentPointIndex);
+
+        AffineTransform at = new AffineTransform();
+        at.concatenate(
+            AffineTransform.getTranslateInstance(
+                center.getX(), center.getY()));
+        at.concatenate(
+            AffineTransform.getRotateInstance(angleRad));
+
+        List<Point2D> corners = transform(alignedCorners, at);
+        return corners;
+    }
+
+    private static int computeAlignmentPointIndex(
+        List<Point2D> points)
+    {
+        double minArea = Double.MAX_VALUE;
+        int minAreaIndex = -1;
+        for (int i=0; i<points.size(); i++)
+        {
+            Rectangle2D r = computeAlignedBounds(points, i);
+            double area = r.getWidth() * r.getHeight();
+
+            if (area < minArea)
+            {
+                minArea = area;
+                minAreaIndex = i;
+            }
+        }
+        return minAreaIndex;
+    }
+
+    private static double computeEdgeAngleRad(
+        List<Point2D> points, int index)
+    {
+        int i0 = index;
+        int i1 = (i0+1)%points.size();
+        Point2D p0 = points.get(i0);
+        Point2D p1 = points.get(i1);
+        double dx = p1.getX() - p0.getX();
+        double dy = p1.getY() - p0.getY();
+        double angleRad = Math.atan2(dy, dx);
+        return angleRad;
+    }
+
+    private static Rectangle2D computeAlignedBounds(
+        List<Point2D> points, int index)
+    {
+        Point2D p0 = points.get(index);
+        double angleRad = computeEdgeAngleRad(points, index);
+        AffineTransform at = createTransform(-angleRad, p0);
+        List<Point2D> transformedPoints = transform(points, at);
+        Rectangle2D bounds = computeBounds(transformedPoints);
+        return bounds;
+    }
+
+    private static AffineTransform createTransform(
+        double angleRad, Point2D center)
+    {
+        AffineTransform at = new AffineTransform();
+        at.concatenate(
+            AffineTransform.getRotateInstance(angleRad));
+        at.concatenate(
+            AffineTransform.getTranslateInstance(
+                -center.getX(), -center.getY()));
+        return at;
+    }
+
+    private static List<Point2D> transform(
+        List<Point2D> points, AffineTransform at)
+    {
+        List<Point2D> result = new ArrayList<Point2D>();
+        for (Point2D p : points)
+        {
+            Point2D tp = at.transform(p, null);
+            result.add(tp);
+        }
+        return result;
+    }
+
+
+    private static Rectangle2D computeBounds(
+        List<Point2D> points)
+    {
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
+        for (Point2D p : points)
+        {
+            double x = p.getX();
+            double y = p.getY();
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+        }
+        return new Rectangle2D.Double(minX, minY, maxX-minX, maxY-minY);
+    }
+
+    static Path2D createPath(List<Point2D> points)
+    {
+        Path2D path = new Path2D.Double();
+        for (int i=0; i<points.size(); i++)
+        {
+            Point2D p = points.get(i);
+            double x = p.getX();
+            double y = p.getY();
+            if (i == 0)
+            {
+                path.moveTo(x, y);
+            }
+            else
+            {
+                path.lineTo(x, y);
+            }
+        }
+        path.closePath();
+        return path;
+    }
+
+
+    static List<Point2D> computeConvexHullPoints(List<Point2D> points)
+    {
+        // NOTE: Converting from Point2D to Point here
+        // because the FastConvexHull class expects
+        // the points with integer coordinates. 
+        // This should be generalized to Point2D!
+        ArrayList<Point> ps = new ArrayList<Point>();
+        for (Point2D p : points)
+        {
+            ps.add(new Point((int)p.getX(), (int)p.getY()));
+        }
+        List<Point> convexHull = FastConvexHull.execute(ps);
+        List<Point2D> result = new ArrayList<Point2D>();
+        for (Point p : convexHull)
+        {
+            double x = p.getX();
+            double y = p.getY();
+            result.add(new Point2D.Double(x,y));
+        }
+        return result;
+    }
+}
+class FastConvexHull
+{
+    public static ArrayList<Point> execute(ArrayList<Point> points)
+    {
+        ArrayList<Point> xSorted = (ArrayList<Point>) points.clone();
+        Collections.sort(xSorted, new XCompare());
+
+        int n = xSorted.size();
+
+        Point[] lUpper = new Point[n];
+
+        lUpper[0] = xSorted.get(0);
+        lUpper[1] = xSorted.get(1);
+
+        int lUpperSize = 2;
+
+        for (int i = 2; i < n; i++)
+        {
+            lUpper[lUpperSize] = xSorted.get(i);
+            lUpperSize++;
+
+            while (lUpperSize > 2 &&
+                !rightTurn(lUpper[lUpperSize - 3], lUpper[lUpperSize - 2],
+                    lUpper[lUpperSize - 1]))
+            {
+                // Remove the middle point of the three last
+                lUpper[lUpperSize - 2] = lUpper[lUpperSize - 1];
+                lUpperSize--;
+            }
+        }
+
+        Point[] lLower = new Point[n];
+
+        lLower[0] = xSorted.get(n - 1);
+        lLower[1] = xSorted.get(n - 2);
+
+        int lLowerSize = 2;
+
+        for (int i = n - 3; i >= 0; i--)
+        {
+            lLower[lLowerSize] = xSorted.get(i);
+            lLowerSize++;
+
+            while (lLowerSize > 2 &&
+                !rightTurn(lLower[lLowerSize - 3], lLower[lLowerSize - 2],
+                    lLower[lLowerSize - 1]))
+            {
+                // Remove the middle point of the three last
+                lLower[lLowerSize - 2] = lLower[lLowerSize - 1];
+                lLowerSize--;
+            }
+        }
+
+        ArrayList<Point> result = new ArrayList<Point>();
+
+        for (int i = 0; i < lUpperSize; i++)
+        {
+            result.add(lUpper[i]);
+        }
+
+        for (int i = 1; i < lLowerSize - 1; i++)
+        {
+            result.add(lLower[i]);
+        }
+
+        return result;
+    }
+
+    private static boolean rightTurn(Point a, Point b, Point c)
+    {
+        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x) > 0;
+    }
+
+    private static class XCompare implements Comparator<Point>
+    {
+        @Override
+        public int compare(Point o1, Point o2)
+        {
+            return (new Integer(o1.x)).compareTo(new Integer(o2.x));
+        }
+    }
+}
+
+
+
+
+
+
 
 
