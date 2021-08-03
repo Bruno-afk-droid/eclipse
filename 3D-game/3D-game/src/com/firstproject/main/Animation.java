@@ -24,6 +24,7 @@ public class Animation {
 		for (int i = 0; i < Frames.length; i++) {
 			FVel[i] = new Position(Frames[i].Position.x, Frames[i].Position.y, Frames[i].Position.z);
 		}
+		updateAll();
 	}
 
 	public Animation(Skeloton[] Frames, LinkedList<Integer> KeyFrames) {
@@ -186,6 +187,12 @@ public class Animation {
 	public void update() {
 		// for(int i=0;i<Frames.length;i++)
 		Frames[Frame].update();
+	}
+
+	public void updateAll() {
+		for (int i = 0; i < this.Frames.length; i++) {
+			Frames[i].update();
+		}
 	}
 
 }

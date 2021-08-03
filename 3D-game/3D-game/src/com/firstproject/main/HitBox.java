@@ -1,10 +1,12 @@
 package com.firstproject.main;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public class HitBox {
+	public Boolean triggerd;
 	String ID = "";
 	Object Owner;
 
@@ -30,6 +32,7 @@ public class HitBox {
 		this.Angle = Angle;
 		this.Radius = Radius;
 		this.Length = Length;
+		this.triggerd = false;
 
 		CR1 = new Circle(PS, Radius);
 		CR2 = new Circle(PD, Radius);
@@ -82,6 +85,7 @@ public class HitBox {
 	}
 
 	public HitBox Intersect(HitBox S) {
+
 		if (this.CR1.Intersect(S.CR1))
 			return S;
 		if (this.CR1.Intersect(S.CR2))
@@ -121,6 +125,7 @@ public class HitBox {
 			return S;
 		if (S.CR2.Intersect(this.L2))
 			return S;
+
 		return null;
 	}
 
@@ -157,13 +162,15 @@ public class HitBox {
 	}
 
 	public void Draw(Graphics2D g) {
-		// Color P = g.getColor();
-		// g.setColor(Color.LIGHT_GRAY);
-		// CR1.Draw(g);
-		// CR2.Draw(g);
-		// g.draw(L1);
-		// g.draw(L2);
-		// g.setColor(P);
+		Color P = g.getColor();
+		g.setColor(Color.LIGHT_GRAY);
+		if (triggerd)
+			g.setColor(Color.YELLOW);
+		CR1.Draw(g);
+		CR2.Draw(g);
+		g.draw(L1);
+		g.draw(L2);
+		g.setColor(P);
 
 	}
 

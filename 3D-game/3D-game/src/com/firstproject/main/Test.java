@@ -137,6 +137,10 @@ public class Test extends MOB {
 		 * Vel.x -= sVel.x; Vel.y -= sVel.y;
 		 */
 
+		if (Handler.object.size() != 1)
+			if (this.MobState.Move.MoveState.Intersection(((Dummy) Handler.object.getLast()).MobState.Move) != null)
+				System.out.println("interact");
+
 		this.Position.plus(Vel);
 		this.Skeloton = MobState.Move.getFrame();
 		// if(this.Skeloton.Position==null)

@@ -3,6 +3,7 @@ package com.firstproject.main;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
+import java.lang.reflect.Field;
 import java.util.LinkedList;
 
 public class Bone extends Fragment {
@@ -371,6 +372,18 @@ public class Bone extends Fragment {
 			((Bone) Joint[i]).update();
 	}
 
+	public void setBonesValue(String valuename, Object value)
+			throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+		Field field;
+		field = HitBox.class.getField(valuename);
+		field.set(this.HitBox, value);
+
+		for (int i = 0; i < this.Joint.length; i++) {
+			((Bone) this.Joint[i]).setBonesValue(valuename, value);
+		}
+	}
+
 	public void addPosition(Position P) {
 
 		PS.plus(P);
@@ -452,8 +465,12 @@ public class Bone extends Fragment {
 		HitBox[] r = null;
 
 		HitBox t = this.HitBox.Intersect(hitBox);
-		if (t != null)
+		if (t != null) {
+			this.HitBox.triggerd = true;
 			r = new HitBox[] { this.HitBox, t };
+		} else {
+			this.HitBox.triggerd = false;
+		}
 
 		for (int i = 0; i < this.Joint.length; i++) {
 			HitBox[] H = ((Bone) this.Joint[i]).Intersect(hitBox);

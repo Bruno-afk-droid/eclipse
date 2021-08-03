@@ -11,6 +11,8 @@ public class Button {
 	public Position gridposition = new Position(0, 0, 0);
 	public Rectangle border = new Rectangle();
 	public Grid owner = null;
+	public boolean solid = false;
+	public boolean doubleClicked = false;
 
 	public Object holding = "";
 
@@ -121,27 +123,38 @@ public class Button {
 		return this;
 	}
 
-	public boolean isTriggerd(Position position, boolean triggerd) {
+	public boolean isTriggerd(Position position, String triggerd) {
 
 		selected = this.border.contains(position.getPointFloat());
 
 		if ((this.selected)) {
-			if (triggerd) {
-				if (!this.triggerd) {
+
+			switch (triggerd) {
+			case "Pressed":
+				if (Pressed != null)
 					Pressed.trigger();
-				} else {
-					if (this.Holded != null)
-						Holded.trigger();
-				}
-			} else {
-				if (this.triggerd) {
-					if (this.Released != null)
-						Released.trigger();
-				}
+				break;
+			case "Holded":
+				if (Holded != null)
+					Holded.trigger();
+				break;
+			case "Released":
+				if (Released != null)
+					Released.trigger();
+				break;
 			}
+
 		}
 
-		return ((this.triggerd = triggerd) && (this.selected));
+		/*
+		 * 
+		 * if (triggerd) { if (!this.triggerd) { Pressed.trigger(); } else { if
+		 * (this.Holded != null) Holded.trigger(); } } else { if (this.triggerd) { if
+		 * (this.Released != null) Released.trigger(); } }
+		 * 
+		 */
+
+		return (triggerd != "Released") && (this.selected);
 	}
 
 	public void move(Position position) {
@@ -175,12 +188,17 @@ public class Button {
 		} else {
 			g.setColor(textColor);
 		}
-		if (holding.getClass().equals("".getClass())) {
-			if (position != null)
-				g.drawString((String) holding, this.position.x, this.position.y);
-		}
+		// if (holding.getClass().equals(int.class)) {
+
+		// }
 		if (holding.getClass().equals((Skeloton.class))) {
 			((Skeloton) holding).Draw(g);
+		} else {
+			if (holding.equals(int.class))
+				g.drawString((holding).toString() + owner.Buttons.indexOf(this), this.border.x,
+						this.border.y + this.border.height);
+			else
+				g.drawString(holding.toString(), this.border.x, this.border.y + this.border.height);
 		}
 
 	}

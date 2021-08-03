@@ -159,6 +159,16 @@ public class Skeloton implements Cloneable {
 		update();
 	}
 
+	public void setBonesValue(String valuename, Object value) {
+
+		try {
+			this.Bones[0].setBonesValue(valuename, value);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public HitBox[] Intersect(HitBox HitBox) {
 		return this.Bones[0].Intersect(HitBox);
 	}
@@ -174,6 +184,8 @@ public class Skeloton implements Cloneable {
 				if (r != null)
 					break;
 			}
+		} else {
+			this.setBonesValue("triggerd", false);
 		}
 
 		return r;

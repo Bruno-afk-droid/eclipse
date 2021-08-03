@@ -20,7 +20,7 @@ public class Move extends Animation {
 	public class State {
 		int index = 0;
 
-		Skeloton Skeloton;
+		Move Owner;
 		public boolean abolishable = true;
 		Position vel = new Position(0, 0, 0);
 		Damage Damage = new Damage();
@@ -28,10 +28,9 @@ public class Move extends Animation {
 		int SuperArmor = 0;
 		int Priority = 1;
 
-		public State(int index, Skeloton Skeloton, Position vel, Damage Damage, Armor Armor, int SuperArmor,
-				int Priority) {
+		public State(int index, Move Owner, Position vel, Damage Damage, Armor Armor, int SuperArmor, int Priority) {
 			this.index = index;
-			this.Skeloton = Skeloton;
+			this.Owner = Owner;
 			this.vel = vel;
 			this.Damage = Damage;
 			this.Armor = Armor;
@@ -45,8 +44,8 @@ public class Move extends Animation {
 
 		@Override
 		public State clone() {
-			return new State(this.index, this.Skeloton.clone(), this.vel.clone(), this.Damage.clone(),
-					this.Armor.clone(), this.SuperArmor, this.Priority);
+			return new State(this.index, this.Owner.clone(), this.vel.clone(), this.Damage.clone(), this.Armor.clone(),
+					this.SuperArmor, this.Priority);
 		}
 
 		public Damage GetDamage(Move Move) {
@@ -69,13 +68,17 @@ public class Move extends Animation {
 		}
 
 		public HitBox[] Intersection(Move Move) {
-			HitBox[] r = Skeloton.Intersect(Move.getFrame());
+			if (Owner == null) {
+				return null;
+			}
+			HitBox[] r = Owner.getFrame().Intersect(Move.getFrame());
 			return r;
 		}
 
 	}
 
 	public Move(String string) {
+		Animation T = this;
 
 		String[] s = Game.ConvertToObjectArguments(string);
 
@@ -128,12 +131,17 @@ public class Move extends Animation {
 			this.TriggerdBy.add(Integer.parseInt(t[i]));
 		}
 
-		this.FVel = new Position[this.Frames.length];
-		AutoFilter();
+		((Animation) this).FVel = new Position[Frames.length];
+		((Animation) this).AutoFilter();
+		// AutoFill(0,6);
+		// AutoFill(6,Frames.length-1);
+		// AutoFill(Frames.length/2,Frames.length-1);
+		// AutoFill(0,Frames.length);
 
-		for (int i = 0; i < this.Frames.length; i++) {
-			FVel[i] = new Position(this.Frames[i].Position.x, this.Frames[i].Position.y, this.Frames[i].Position.z);
+		for (int i = 0; i < Frames.length; i++) {
+			((Animation) this).FVel[i] = new Position(Frames[i].Position.x, Frames[i].Position.y, Frames[i].Position.z);
 		}
+
 		this.MoveStates = new State[this.Frames.length];
 
 		setup();
@@ -198,7 +206,7 @@ public class Move extends Animation {
 		}
 
 		for (int i = 0; i < this.KeyFrames.size(); i++) {
-			MoveStates[this.KeyFrames.get(i)] = new State(this.KeyFrames.get(i), ActiveFrame, vel[i], new Damage(),
+			MoveStates[this.KeyFrames.get(i)] = new State(this.KeyFrames.get(i), this, vel[i], new Damage(),
 					new Armor(), 0, 1);
 		}
 
@@ -241,9 +249,10 @@ public class Move extends Animation {
 
 		int p = 0;
 		for (int i = 0; i < this.KeyFrames.size(); i++) {
-			MoveStates[this.KeyFrames.get(i)] = new State(this.KeyFrames.get(i), ActiveFrame, vel[i], new Damage(),
+			MoveStates[this.KeyFrames.get(i)] = new State(this.KeyFrames.get(i), this, vel[i], new Damage(),
 					new Armor(), 0, 0);
 		}
+		this.updateAll();
 
 	}
 

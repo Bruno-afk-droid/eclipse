@@ -122,10 +122,12 @@ public class Game extends Canvas implements Runnable {
 		S = AnimationList.Idle().getFrame();
 		S.update();
 		Animation k = AnimationList.KickAttack();
-		handler.Buttons.add(new Grid(new Position(0, 35, 0), new Rectangle(0, 35), true));
-		for (int i = 0; i < k.KeyFrames.size(); i++)
-			((Grid) handler.Buttons.getLast()).add(i,
-					new Grid(new Position(0, 0, 0), k.Frames[k.KeyFrames.get(i)].clone()));
+		// handler.Buttons.add(new Grid(new Position(0, 180, 0), new Rectangle(0, 35),
+		// true));
+		// for (int i = 0; i < k.KeyFrames.size(); i++)
+		// ((Grid) handler.Buttons.getLast()).add(i,
+		// new Grid(new Position(0, 0, 0), k.Frames[k.KeyFrames.get(i)].clone(),
+		// k.KeyFrames.get(i)));
 
 		LinkedList<Move> M = new LinkedList<Move>();
 

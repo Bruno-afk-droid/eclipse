@@ -17,13 +17,14 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
-		Game.handler.MOUSE_Clicked = true;
+		Game.handler.MOUSE_Clicked = "Pressed";
+		System.out.print("<Pressed");
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		Game.handler.MOUSE_Clicked = false;
-
+		Game.handler.MOUSE_Clicked = "Released";
+		System.out.println("Released>");
 	}
 
 	@Override

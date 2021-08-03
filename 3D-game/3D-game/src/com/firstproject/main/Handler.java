@@ -20,7 +20,7 @@ public class Handler {
 	public static double MOVE_ANGLE_LENGTH = 0;
 
 	public static Position MOUSE_Position = new Position(0, 0, 0);
-	public static boolean MOUSE_Clicked = false;
+	public static String MOUSE_Clicked = "";
 
 	public static int getObjectIndex(GameObject O) {
 		for (int i = 0; i < object.size(); i++)
@@ -52,6 +52,11 @@ public class Handler {
 			if (!B)
 				B = Buttons.get(i).isTriggerd(MOUSE_Position, MOUSE_Clicked);
 			Buttons.get(i).tick();
+		}
+
+		if (MOUSE_Clicked == "Pressed") {
+			MOUSE_Clicked = "Holded";
+			System.out.print("-Holded-");
 		}
 	}
 
